@@ -1,9 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using NiceApteka.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
 
 builder.Services.AddControllers();
-
+builder.Services.AddDbContext<NiceaptekaContext>(options =>
+options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
