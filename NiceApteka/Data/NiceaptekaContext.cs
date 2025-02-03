@@ -20,8 +20,6 @@ public partial class NiceaptekaContext : DbContext
 
     public virtual DbSet<Order> Orders { get; set; }
 
-    public virtual DbSet<OrderItem> OrderItems { get; set; }
-
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -58,40 +56,23 @@ public partial class NiceaptekaContext : DbContext
                 .HasMaxLength(50)
                 .HasDefaultValueSql("'Pending'::character varying")
                 .HasColumnName("status");
-            entity.Property(e => e.TotalAmount)
+            entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
-                .HasColumnName("total_amount");
+                .HasColumnName("price");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("orders_user_id_fkey");
-        });
 
-        modelBuilder.Entity<OrderItem>(entity =>
-        {
-            entity.HasKey(e => e.OrderItemId).HasName("order_items_pkey");
-
-            entity.ToTable("order_items");
-
-            entity.Property(e => e.OrderItemId).HasColumnName("order_item_id");
-            entity.Property(e => e.OrderId).HasColumnName("order_id");
-            entity.Property(e => e.Price)
-                .HasPrecision(10, 2)
-                .HasColumnName("price");
-            entity.Property(e => e.ProductId).HasColumnName("product_id");
-            entity.Property(e => e.Quantity).HasColumnName("quantity");
-
-            entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.OrderId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("order_items_order_id_fkey");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.OrderItems)
+            entity.HasOne(d => d.Product) // Добавили связь с продуктом
+                .WithMany()
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("order_items_product_id_fkey");
+                .HasConstraintName("orders_product_id_fkey");
         });
 
         modelBuilder.Entity<Product>(entity =>
