@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using NiceApteka.Data;
 using NiceApteka.Models;
 
@@ -18,11 +19,30 @@ namespace NiceApteka.Controllers
         public IActionResult GetOrders()
         {
             var orders = _db.Orders.ToList();
+
+            var ordersDTO = new List<OrderDTO>();
+
             if (orders == null)
             {
                 return NotFound();
             }
-            return Ok(orders);
+
+            foreach (var order in orders)
+            {
+                var orderDTO = new OrderDTO
+                {
+                    OrderId = order.OrderId,
+                    ProductId = order.ProductId,
+                    Quantity = order.Quantity,
+                    Price = order.Price,
+                    Status = order.Status,
+                    CreatedAt = order.CreatedAt
+                };
+
+                ordersDTO.Add(orderDTO);
+            }
+
+            return Ok(ordersDTO);
         }
 
         [Route("order/{id}")]
@@ -30,11 +50,23 @@ namespace NiceApteka.Controllers
         public IActionResult GetOrderById([FromRoute] int id)
         {
             var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
+
             if (order == null)
             {
                 return NotFound();
             }
-            return Ok(order);
+
+            var orderDTO = new OrderDTO
+            {
+                OrderId = order.OrderId,
+                ProductId = order.ProductId,
+                Quantity = order.Quantity,
+                Price = order.Price,
+                Status = order.Status,
+                CreatedAt = order.CreatedAt
+            };
+
+            return Ok(orderDTO);
         }
 
         [Route("order/add")]

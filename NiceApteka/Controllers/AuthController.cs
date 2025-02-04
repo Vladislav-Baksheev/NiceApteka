@@ -20,11 +20,26 @@ namespace NiceApteka.Controllers
         public IActionResult GetUsers()
         {
             var users = _db.Users.ToList();
+
+            var usersDTO = new List<UserDTO>();
+
             if (users == null)
             {
                 return NotFound();
             }
-            return Ok(users);
+
+            foreach (var user in users)
+            {
+                var userDTO = new UserDTO
+                {
+                    UserId = user.UserId,
+                    Email = user.Email
+                };
+
+                usersDTO.Add(userDTO);
+            }
+
+            return Ok(usersDTO);
         }
 
         [Route("auth/users/{id}")]
@@ -36,7 +51,14 @@ namespace NiceApteka.Controllers
             {
                 return NotFound();
             }
-            return Ok(user);
+
+            var userDTO = new UserDTO
+            {
+                UserId = user.UserId,
+                Email = user.Email
+            };
+
+            return Ok(userDTO);
         }
 
         [Route("auth/users/register")]

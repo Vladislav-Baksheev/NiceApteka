@@ -19,11 +19,31 @@ namespace NiceApteka.Controllers
         public IActionResult GetProducts()
         {
             var products = _db.Products.ToList();
+
+            var productsDTO = new List<ProductDTO>();
+
             if (products == null)
             {
                 return NotFound();
             }
-            return Ok(products);
+
+            foreach (var product in products)
+            {
+                var productDTO = new ProductDTO
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    QuantityInStock = product.QuantityInStock,
+                    ImageUrl = product.ImageUrl,
+                    CategoryId = product.CategoryId
+                };
+
+                productsDTO.Add(productDTO);
+            }
+
+            return Ok(productsDTO);
         }
 
         [Route("product/{id}")]
@@ -35,7 +55,19 @@ namespace NiceApteka.Controllers
             {
                 return NotFound();
             }
-            return Ok(product);
+
+            var productDTO = new ProductDTO
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                QuantityInStock = product.QuantityInStock,
+                ImageUrl = product.ImageUrl,
+                CategoryId = product.CategoryId
+            };
+
+            return Ok(productDTO);
         }
 
         [Route("product/add")]
