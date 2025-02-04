@@ -18,7 +18,7 @@ namespace NiceApteka.Controllers
         [HttpGet]
         public IActionResult GetProducts()
         {
-            var products = _db.Products;
+            var products = _db.Products.ToList();
             if (products == null)
             {
                 return NotFound();
@@ -42,6 +42,11 @@ namespace NiceApteka.Controllers
         [HttpPost]
         public IActionResult AddProduct(Product product)
         {
+            if (product == null)
+            {
+                return BadRequest();
+            }
+
             try
             {
                 _db.Products.Add(product);
@@ -51,10 +56,7 @@ namespace NiceApteka.Controllers
             {
                 Console.WriteLine(ex.ToString());
             }
-            if (product == null)
-            {
-                return BadRequest();
-            }
+            
             return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
         }
 
@@ -69,9 +71,16 @@ namespace NiceApteka.Controllers
                 return NotFound(new { message = "Product not found" });
             }
 
-            _db.Products.Remove(product);
-
-            _db.SaveChanges();
+            try
+            {
+                _db.Products.Remove(product);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            
 
             return Ok(new { message = "Product is deleted" });
         }

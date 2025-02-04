@@ -17,7 +17,7 @@ namespace NiceApteka.Controllers
         [HttpGet]
         public IActionResult GetOrders()
         {
-            var orders = _db.Orders;
+            var orders = _db.Orders.ToList();
             if (orders == null)
             {
                 return NotFound();
@@ -41,6 +41,10 @@ namespace NiceApteka.Controllers
         [HttpPost]
         public IActionResult AddOrder(Order order)
         {
+            if (order == null)
+            {
+                return BadRequest();
+            }
             try
             {
                 _db.Orders.Add(order);
@@ -50,10 +54,7 @@ namespace NiceApteka.Controllers
             {
                 Console.WriteLine(ex.ToString());
             }
-            if (order == null)
-            {
-                return BadRequest();
-            }
+            
             return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, order);
         }
     }

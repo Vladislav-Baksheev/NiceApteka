@@ -19,7 +19,7 @@ namespace NiceApteka.Controllers
         [HttpGet]
         public IActionResult GetUsers()
         {
-            var users = _db.Users;
+            var users = _db.Users.ToList();
             if (users == null)
             {
                 return NotFound();
@@ -42,7 +42,11 @@ namespace NiceApteka.Controllers
         [Route("auth/users/register")]
         [HttpPost]
         public IActionResult RegisterUser(User user)
-        {  
+        {
+            if (user == null)
+            {
+                return BadRequest();
+            }
             try
             {
                 _db.Users.Add(user);
@@ -52,10 +56,7 @@ namespace NiceApteka.Controllers
             {
                 Console.WriteLine(ex.ToString());   
             }
-            if (user == null)
-            {
-                return BadRequest();
-            }
+            
             return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user); 
         }
 
@@ -63,7 +64,7 @@ namespace NiceApteka.Controllers
         [HttpPost]
         public IActionResult AuthUser(User user)
         {
-            User? person = _db.Users.FirstOrDefault(p => p.Email == user.Email && p.PasswordHash == user.PasswordHash);
+            var person = _db.Users.FirstOrDefault(p => p.Email == user.Email && p.PasswordHash == user.PasswordHash);
 
             if (person is null) return Unauthorized();
 
