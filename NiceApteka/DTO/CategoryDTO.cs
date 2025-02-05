@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NiceApteka.Models;
+namespace NiceApteka.DTO;
 
 public partial class CategoryDTO
 {

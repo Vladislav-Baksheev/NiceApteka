@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NiceApteka.Data;
+using NiceApteka.DTO;
 using NiceApteka.Models;
 
 namespace NiceApteka.Controllers
@@ -32,7 +33,6 @@ namespace NiceApteka.Controllers
                 var orderDTO = new OrderDTO
                 {
                     OrderId = order.OrderId,
-                    ProductId = order.ProductId,
                     Quantity = order.Quantity,
                     Price = order.Price,
                     Status = order.Status,
@@ -59,7 +59,6 @@ namespace NiceApteka.Controllers
             var orderDTO = new OrderDTO
             {
                 OrderId = order.OrderId,
-                ProductId = order.ProductId,
                 Quantity = order.Quantity,
                 Price = order.Price,
                 Status = order.Status,
@@ -71,12 +70,22 @@ namespace NiceApteka.Controllers
 
         [Route("order/add")]
         [HttpPost]
-        public IActionResult AddOrder(Order order)
+        public IActionResult AddOrder(OrderDTO orderDto)
         {
-            if (order == null)
+            if (orderDto == null)
             {
                 return BadRequest();
             }
+
+            var order = new Order
+            {
+                OrderId = orderDto.OrderId,
+                Quantity = orderDto.Quantity,
+                Price = orderDto.Price,
+                Status = orderDto.Status,
+                CreatedAt = orderDto.CreatedAt
+            };
+
             try
             {
                 _db.Orders.Add(order);
@@ -87,7 +96,7 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());
             }
             
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, order);
+            return CreatedAtAction(nameof(GetOrderById), new { id = orderDto.OrderId }, orderDto);
         }
     }
 }

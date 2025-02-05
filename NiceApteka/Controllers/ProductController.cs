@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NiceApteka.Data;
+using NiceApteka.DTO;
 using NiceApteka.Models;
 
 namespace NiceApteka.Controllers
@@ -36,8 +37,7 @@ namespace NiceApteka.Controllers
                     Description = product.Description,
                     Price = product.Price,
                     QuantityInStock = product.QuantityInStock,
-                    ImageUrl = product.ImageUrl,
-                    CategoryId = product.CategoryId
+                    ImageUrl = product.ImageUrl
                 };
 
                 productsDTO.Add(productDTO);
@@ -63,8 +63,7 @@ namespace NiceApteka.Controllers
                 Description = product.Description,
                 Price = product.Price,
                 QuantityInStock = product.QuantityInStock,
-                ImageUrl = product.ImageUrl,
-                CategoryId = product.CategoryId
+                ImageUrl = product.ImageUrl
             };
 
             return Ok(productDTO);
@@ -72,12 +71,22 @@ namespace NiceApteka.Controllers
 
         [Route("product/add")]
         [HttpPost]
-        public IActionResult AddProduct(Product product)
+        public IActionResult AddProduct(ProductDTO productDto)
         {
-            if (product == null)
+            if (productDto == null)
             {
                 return BadRequest();
             }
+
+            var product = new Product
+            {
+                ProductId = productDto.ProductId,
+                Name = productDto.Name,
+                Description = productDto.Description,
+                Price = productDto.Price,
+                QuantityInStock = productDto.QuantityInStock,
+                ImageUrl = productDto.ImageUrl
+            };
 
             try
             {
@@ -89,7 +98,7 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());
             }
             
-            return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
+            return CreatedAtAction(nameof(GetProductById), new { id = productDto.ProductId }, productDto);
         }
 
         [Route("product/delete/{id}")]
@@ -119,12 +128,22 @@ namespace NiceApteka.Controllers
 
         [Route("product/edit/{id}")]
         [HttpPut]
-        public IActionResult EditProduct([FromRoute] int id, Product product)
+        public IActionResult EditProduct([FromRoute] int id, ProductDTO productDto)
         {
-            if (product == null)
+            if (productDto == null)
             {
                 return NotFound(new { message = "Product not found" });
             }
+
+            var product = new Product
+            {
+                ProductId = productDto.ProductId,
+                Name = productDto.Name,
+                Description = productDto.Description,
+                Price = productDto.Price,
+                QuantityInStock = productDto.QuantityInStock,
+                ImageUrl = productDto.ImageUrl
+            };
 
             _db.Entry(product).State = EntityState.Modified;
 

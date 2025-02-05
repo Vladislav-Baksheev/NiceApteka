@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using NiceApteka.Data;
+using NiceApteka.DTO;
 using NiceApteka.Models;
 using System;
+using System.Net;
 
 namespace NiceApteka.Controllers
 {
@@ -21,7 +24,7 @@ namespace NiceApteka.Controllers
         {
             var users = _db.Users.ToList();
 
-            var usersDTO = new List<UserDTO>();
+            var usersDTO = new List<UserDTOResponse>();
 
             if (users == null)
             {
@@ -30,7 +33,7 @@ namespace NiceApteka.Controllers
 
             foreach (var user in users)
             {
-                var userDTO = new UserDTO
+                var userDTO = new UserDTOResponse
                 {
                     UserId = user.UserId,
                     Email = user.Email
@@ -52,7 +55,7 @@ namespace NiceApteka.Controllers
                 return NotFound();
             }
 
-            var userDTO = new UserDTO
+            var userDTO = new UserDTOResponse
             {
                 UserId = user.UserId,
                 Email = user.Email
@@ -63,12 +66,22 @@ namespace NiceApteka.Controllers
 
         [Route("auth/users/register")]
         [HttpPost]
-        public IActionResult RegisterUser(User user)
+        public IActionResult RegisterUser(UserDTORegister userDto)
         {
-            if (user == null)
+            if (userDto == null)
             {
                 return BadRequest();
             }
+
+            var user = new User
+            {
+                UserId = userDto.UserId,
+                Email = userDto.Email,
+                PasswordHash = userDto.PasswordHash,
+                Address = userDto.Address,
+                PhoneNumber = userDto.PhoneNumber
+            };
+
             try
             {
                 _db.Users.Add(user);
@@ -79,14 +92,14 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());   
             }
             
-            return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user); 
+            return CreatedAtAction(nameof(GetUserById), new { id = userDto.UserId }, userDto); 
         }
 
         [Route("auth/users/auth")]
         [HttpPost]
-        public IActionResult AuthUser(User user)
+        public IActionResult AuthUser(UserDTOAuth userDto)
         {
-            var person = _db.Users.FirstOrDefault(p => p.Email == user.Email && p.PasswordHash == user.PasswordHash);
+            var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email && p.PasswordHash == userDto.PasswordHash);
 
             if (person is null) return Unauthorized();
 

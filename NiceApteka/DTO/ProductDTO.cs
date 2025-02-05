@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NiceApteka.Models;
+namespace NiceApteka.DTO;
 
 public partial class ProductDTO
 {
@@ -16,6 +16,4 @@ public partial class ProductDTO
     public int QuantityInStock { get; set; }
 
     public string? ImageUrl { get; set; }
-
-    public int? CategoryId { get; set; }
 }
