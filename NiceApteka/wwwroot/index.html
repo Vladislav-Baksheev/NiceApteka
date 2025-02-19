@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аптека</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            LOGO
+        </div>
+        <div class="menu">
+            <a href="index.html" class="link" id="linkToIndex">
+                <div class="title">Главная</div>
+                <div class="bar"></div>
+            </a>
+            <a href="#" class="link">
+                <div class="title">Корзина</div>
+                <div class="bar"></div>
+            </a>
+            <a href="auth.html" class="link" id="linkToAuth">
+                <div class="title" id="enter">Вход</div>
+                <div class="bar"></div>
+            </a>
+            <button onclick="exit()" id="exitBtn">
+                <img 
+                     src="https://i1.sndcdn.com/artworks-000415899078-osz220-t500x500.jpg"
+                     style="
+                        width: 25px
+                        "/>
+            </button>
+        </div>
+    </div>
+
+    <div id="wrapper">
+        <aside>
+            <ul id="categories">
+            </ul>
+        </aside>
+    </div>
+    
+
+    <script src="scripts.js"></script>
+    <script type="text/javascript">
+        init();
+    </script>
+</body>
+</html>
