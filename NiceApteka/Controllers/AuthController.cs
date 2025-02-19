@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NiceApteka.Data;
 using NiceApteka.DTO;
 using NiceApteka.Models;
+using NiceApteka.Services;
 using System;
 using System.Net;
 
@@ -13,12 +15,14 @@ namespace NiceApteka.Controllers
     {
         private readonly NiceaptekaContext _db;
 
+        private readonly PasswordHasher _passwordHasher = new PasswordHasher();
+
         public AuthController(NiceaptekaContext db) 
         {
             _db = db;
         }
 
-        [Route("auth/users")]
+        [Route("users")]
         [HttpGet]
         public IActionResult GetUsers()
         {
@@ -45,7 +49,7 @@ namespace NiceApteka.Controllers
             return Ok(usersDTO);
         }
 
-        [Route("auth/users/{id}")]
+        [Route("user/{id}")]
         [HttpGet]
         public IActionResult GetUserById([FromRoute] int id)
         {
@@ -64,7 +68,7 @@ namespace NiceApteka.Controllers
             return Ok(userDTO);
         }
 
-        [Route("auth/users/register")]
+        [Route("register/user")]
         [HttpPost]
         public IActionResult RegisterUser(UserDTORegister userDto)
         {
@@ -77,7 +81,7 @@ namespace NiceApteka.Controllers
             {
                 UserId = userDto.UserId,
                 Email = userDto.Email,
-                PasswordHash = userDto.PasswordHash,
+                PasswordHash = _passwordHasher.Generate(userDto.PasswordHash),
                 Address = userDto.Address,
                 PhoneNumber = userDto.PhoneNumber
             };
@@ -91,24 +95,26 @@ namespace NiceApteka.Controllers
             {
                 Console.WriteLine(ex.ToString());   
             }
-            
+            // TODO: не ловится ошибка, если пользователь с такой же почтой существует
             return CreatedAtAction(nameof(GetUserById), new { id = userDto.UserId }, userDto); 
         }
 
-        [Route("auth/users/auth")]
+        [Route("auth/user")]
         [HttpPost]
         public IActionResult AuthUser(UserDTOAuth userDto)
         {
-            var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email && p.PasswordHash == userDto.PasswordHash);
+            var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email);
 
             if (person is null) return Unauthorized();
 
-            var response = new
-            {
-                username = person.Email 
-            };
+            var isLogged = _passwordHasher.Verify(userDto.PasswordHash, person.PasswordHash);
 
-            return Ok(response);
+            if (isLogged)
+            {
+                return Ok(person.Email);
+            }
+
+            return Unauthorized();
         }
     }
 }
