@@ -5,9 +5,23 @@ html, body {
     font-weight: 200;
     margin: 0;
 }
+
 .hidden {
     display: none;
 }
+
+.menu {
+    display: inline-block;
+    padding: 5px 0;
+    margin: 5px 5px;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #0f0f0f;
+    font-weight: 800;
+    font-size: 24px;
+}
+
 .header {
     width: 100%;
     border-bottom: 1px solid black;
@@ -29,8 +43,8 @@ html, body {
 
 .link {
     display: inline-block;
-    padding: 15px 0;
-    margin: 15px 25px;
+    padding: 5px 0;
+    margin: 15px 5px;
     position: relative;
     text-decoration: none;
     text-transform: uppercase;
@@ -77,7 +91,7 @@ ul {
     display: inline-block;
     background: white;
     width: 250px;
-    height: 450px;
+    height: auto;
     margin: 10px;
     top: 50%;
     left: 50%;
@@ -102,9 +116,17 @@ ul {
     width: 55%;
     border-left: 2px solid #efefef;
 }
+#products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+#linkToProfile {
+    border: none;
+}
 
-h1
-{
+h1 {
     color: #515151;
     font-weight: 300;
     padding-top: 15px;
@@ -142,7 +164,7 @@ button {
     background: none;
     border: 1px solid #d9d9d9;
     padding: 8px 0px;
-    margin-bottom: 30px;
+    margin-bottom: 1px;
     color: #515151;
     text-transform: uppercase;
     width: 125px;
@@ -158,6 +180,91 @@ button:hover
     color: #aedaa6;
     cursor: pointer;
 }
+
+/*НАЧАЛО БЛОКА МОДАЛЬНОГО ОКНА*/
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    padding-top: 100px; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+
+.modal-content {
+    position: relative;
+    background-color: #E1BEE7;
+    margin: auto;
+    padding: 0;
+    border: 5px solid #7B1FA2;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+
+@-webkit-keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+
+.close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #9C27B0;
+    color: white;
+}
+
+.modal-body {
+    display: block;
+    padding: 2px 16px;
+}
+
+/*КОНЕЦ БЛОКА МОДАЛЬНОГО ОКНА*/
+
+
 
 #authBlock {
     width: 50%;
@@ -191,3 +298,4 @@ button:hover
         #authBlock a:hover {
             text-decoration: underline;
         }
+

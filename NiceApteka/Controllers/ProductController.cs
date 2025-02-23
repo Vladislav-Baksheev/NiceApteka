@@ -128,24 +128,20 @@ namespace NiceApteka.Controllers
 
         [Route("product/edit/{id}")]
         [HttpPut]
-        public IActionResult EditProduct([FromRoute] int id, ProductDTO productDto)
+        public IActionResult EditProduct([FromRoute] int id, [FromBody]ProductDTO productDto)
         {
-            if (productDto == null)
+            var product = _db.Products.FirstOrDefault(p => p.ProductId == id);
+
+            if (product == null)
             {
-                return NotFound(new { message = "Product not found" });
+                return NotFound("Товар не найден");
             }
 
-            var product = new Product
-            {
-                ProductId = productDto.ProductId,
-                Name = productDto.Name,
-                Description = productDto.Description,
-                Price = productDto.Price,
-                QuantityInStock = productDto.QuantityInStock,
-                ImageUrl = productDto.ImageUrl
-            };
-
-            _db.Entry(product).State = EntityState.Modified;
+            // Обновление полей
+            product.Name = productDto.Name;
+            product.Price = productDto.Price;
+            product.Description = productDto.Description;
+            product.ImageUrl = productDto.ImageUrl;
 
             _db.SaveChanges();
 

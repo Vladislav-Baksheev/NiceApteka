@@ -1,6 +1,6 @@
 ﻿let products = [];
 const authCookieName = 'auth_cookie';
-let user; 
+let user = []; 
 
 function init(){
     getProducts();
@@ -10,23 +10,41 @@ function init(){
             name: cookieName
         };
         document.getElementById('exitBtn').classList.remove('hidden');
-        document.getElementById('enter').innerText = user.name;
+        document.getElementById('enter').classList.add('hidden');
+        document.getElementById('linkToProfile').innerText = user.name;
     }
     else {
+        document.getElementById('enter').classList.remove('hidden');
         document.getElementById('exitBtn').classList.add('hidden');
+        document.getElementById('linkToProfile').classList.add('hidden');
     }
 }
 
 //Получить товары
 function getProducts() {
+    document.getElementById('products-container').innerHTML = '<div class="loader">Загрузка...</div>';
     fetch("products")
         .then(reponse => reponse.json())
         .then(data => _displayProducts(data))
         .catch(error => console.error('Unable to get products.', error));
 }
 
+function getUser() {
+    fetch("userByEmail/" + user.name)
+        .then(reponse => reponse.json())
+        .then(data => _displayUserFields(data))
+        .catch(error => console.error('Unable to get user.', error));
+}
+
+
 //Вывести товары на сайт
 function _displayProducts(data) {
+
+    const container = document.getElementById('products-container');
+
+    // Очищаем контейнер перед добавлением новых элементов
+    container.innerHTML = '';
+
     data.forEach(product => {
         //div's
         var divCard = document.createElement("div");
@@ -47,6 +65,8 @@ function _displayProducts(data) {
         var productPrice = document.createElement("h1");
         var productDescription = document.createElement("p");
         var addToCartBtn = document.createElement("button");
+        var editProductBtn = document.createElement("button");
+        var deleteProductBtn = document.createElement("button");
 
 
         divCard.className = "card";
@@ -60,17 +80,51 @@ function _displayProducts(data) {
         productPrice.textContent = product.price;
         productDescription.textContent = product.description;
         addToCartBtn.textContent = "Добавить в корзину";
+        addToCartBtn.addEventListener("click", addToCart, false)
+        editProductBtn.addEventListener("click", editProduct, false)
+        deleteProductBtn.addEventListener("click", deleteProduct, false)
+
+        editProductBtn.dataset.productId = product.productId;
+        deleteProductBtn.dataset.productId = product.productId;
 
         divPhoto.appendChild(img);
         divDescription.appendChild(productName);
         divDescription.appendChild(productPrice);
         divDescription.appendChild(productDescription);
         divDescription.appendChild(addToCartBtn);
+        if (user.name == "admin") {
+            editProductBtn.textContent = "Изменить товар";
+            deleteProductBtn.textContent = "Удалить товар";
+
+            divDescription.appendChild(editProductBtn);
+            divDescription.appendChild(deleteProductBtn);
+        }
         divCard.appendChild(divPhoto);
         divCard.appendChild(divDescription);
 
-        document.body.appendChild(divCard);
+        container.appendChild(divCard);
     });
+    products = data;
+}
+
+function _displayUserFields(userData) {
+    // Убедимся, что данные есть и это объект
+    if (!userData) {
+        console.error('User data is undefined');
+        return;
+    }
+
+    let address = document.getElementById("userAddressEdit");
+    let phone = document.getElementById("userPhoneEdit");
+
+    // Проверяем существование элементов в DOM
+    if (!address || !phone) {
+        console.error('Address or phone elements not found');
+        return;
+    }
+
+    address.value = userData.address || ''; // Используем value для input или textContent для других элементов
+    phone.value = userData.phoneNumber || '';
 }
 
 //Получить куки с сайта, чтобы проверить авторизован ли еще чел
@@ -93,4 +147,117 @@ function exit() {
 
 function deleteCookie(name) {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+var modal = document.getElementById('profileModal');
+var span = document.getElementById("closeModal");
+
+function openEditUser() {
+    modal.style.display = "block";
+    getUser();
+}
+
+span.onclick = function () {
+    modal.style.display = "none";
+}
+
+
+window.onclick = function (event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+function saveChangesUser() {
+    const address = document.getElementById("userAddressEdit").value;
+    const phone = document.getElementById("userPhoneEdit").value;
+    // Формируем объект для отправки
+    const userData = {
+        email: user.name, // Предполагая, что user.name содержит email
+        address: address,
+        phoneNumber: phone
+    };
+
+    // Отправляем PUT-запрос
+    fetch(`user/edit/${user.name}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка сохранения');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Изменения сохранены!');
+            modal.style.display = "none"; // Закрываем модалку
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            console.log('Ошибка при сохранении: ' + error.message);
+        });
+}
+
+function addToCart() {
+    alert("Товар добавлен!")
+}
+
+let currentProductId = null;
+modal = document.getElementById('productModal');
+
+function editProduct(event) {
+    const productId = event.target.dataset.productId;
+    document.getElementById('productId').value = productId;
+    const product = products.find(p => p.productId == productId);
+
+    //document.getElementById('productId').value = product.productId;
+    document.getElementById('productNameEdit').value = product.name;
+    document.getElementById('productPriceEdit').value = product.price;
+    document.getElementById('productDescriptionEdit').value = product.description;
+    document.getElementById('productPhotoEdit').value = product.imageUrl;
+
+    modal.style.display = 'block';
+}
+
+function deleteProduct(event) {
+    if (!confirm('Вы уверены, что хотите удалить товар?')) return;
+
+    const productId = event.target.dataset.productId;
+
+    fetch(`/product/delete/${productId}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка удаления');
+            products = [];
+            getProducts(); // Обновляем список товаров
+        })
+        .catch(error => alert(error.message));
+}
+
+function saveProductChanges() {
+    const productData = {
+        productId: document.getElementById('productId').value,
+        name: document.getElementById('productNameEdit').value,
+        price: document.getElementById('productPriceEdit').value,
+        description: document.getElementById('productDescriptionEdit').value,
+        imageUrl: document.getElementById('productPhotoEdit').value
+    };
+
+    fetch(`/product/edit/${productData.productId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка сохранения');
+            productModal.style.display = 'none';
+            getProducts(); // Обновляем список товаров
+        })
+        .catch(error => alert(error.message));
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NiceApteka.Data;
 using NiceApteka.DTO;
 using NiceApteka.Models;
@@ -68,6 +69,27 @@ namespace NiceApteka.Controllers
             return Ok(userDTO);
         }
 
+        [Route("userByEmail/{email}")]
+        [HttpGet]
+        public IActionResult GetUserByEmail([FromRoute] string email)
+        {
+            var user = _db.Users.FirstOrDefault(p => p.Email == email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userDTO = new UserDTOResponse
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Address = user.Address,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return Ok(userDTO);
+        }
+
         [Route("register/user")]
         [HttpPost]
         public IActionResult RegisterUser(UserDTORegister userDto)
@@ -115,6 +137,27 @@ namespace NiceApteka.Controllers
             }
 
             return Unauthorized();
+        }
+
+        [Route("user/edit/{email}")] 
+        [HttpPut]
+        public IActionResult EditUser([FromRoute] string email, [FromBody] UserDTOResponse userDto) 
+        {
+            // Находим пользователя по email
+            var user = _db.Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Обновляем только изменяемые поля
+            user.Address = userDto.Address;
+            user.PhoneNumber = userDto.PhoneNumber;
+
+            _db.SaveChanges();
+
+            return Ok(new { message = "Данные обновлены" });
         }
     }
 }
