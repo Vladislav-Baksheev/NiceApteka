@@ -17,6 +17,7 @@ function init(){
     }
 }
 
+//Получить товары
 function getProducts() {
     fetch("products")
         .then(reponse => reponse.json())
@@ -24,6 +25,7 @@ function getProducts() {
         .catch(error => console.error('Unable to get products.', error));
 }
 
+//Вывести товары на сайт
 function _displayProducts(data) {
     data.forEach(product => {
         //div's
@@ -71,6 +73,7 @@ function _displayProducts(data) {
     });
 }
 
+//Получить куки с сайта, чтобы проверить авторизован ли еще чел
 function getCookie(name) {
     const nameEQ = name + "=";
     const ca = document.cookie.split(';');
@@ -82,6 +85,7 @@ function getCookie(name) {
     return null;
 }
 
+//Выйти с аккаунта, удалив куки
 function exit() {
     deleteCookie(authCookieName);
     window.location.href = 'auth.html'
