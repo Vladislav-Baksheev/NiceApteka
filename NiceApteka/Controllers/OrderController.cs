@@ -15,41 +15,11 @@ namespace NiceApteka.Controllers
             _db = db;
         }
 
-        [Route("orders")]
-        [HttpGet]
-        public IActionResult GetOrders()
-        {
-            var orders = _db.Orders.ToList();
-
-            var ordersDTO = new List<OrderDTO>();
-
-            if (orders == null)
-            {
-                return NotFound();
-            }
-
-            foreach (var order in orders)
-            {
-                var orderDTO = new OrderDTO
-                {
-                    OrderId = order.OrderId,
-                    Quantity = order.Quantity,
-                    Price = order.Price,
-                    Status = order.Status,
-                    CreatedAt = order.CreatedAt
-                };
-
-                ordersDTO.Add(orderDTO);
-            }
-
-            return Ok(ordersDTO);
-        }
-
         [Route("order/{id}")]
         [HttpGet]
-        public IActionResult GetOrderById([FromRoute] int id)
+        public IActionResult GetOrderByUserId([FromRoute] int id)
         {
-            var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
+            var order = _db.Orders.FirstOrDefault(p => p.UserId == id);
 
             if (order == null)
             {
@@ -61,8 +31,7 @@ namespace NiceApteka.Controllers
                 OrderId = order.OrderId,
                 Quantity = order.Quantity,
                 Price = order.Price,
-                Status = order.Status,
-                CreatedAt = order.CreatedAt
+                Status = order.Status
             };
 
             return Ok(orderDTO);
@@ -70,7 +39,7 @@ namespace NiceApteka.Controllers
 
         [Route("order/add")]
         [HttpPost]
-        public IActionResult AddOrder(OrderDTO orderDto)
+        public IActionResult AddOrder([FromBody]OrderDTO orderDto, [FromRoute] int userId)
         {
             if (orderDto == null)
             {
@@ -79,11 +48,11 @@ namespace NiceApteka.Controllers
 
             var order = new Order
             {
-                OrderId = orderDto.OrderId,
+                UserId = userId,
+                ProductId = orderDto.ProductId,
                 Quantity = orderDto.Quantity,
                 Price = orderDto.Price,
-                Status = orderDto.Status,
-                CreatedAt = orderDto.CreatedAt
+                Status = orderDto.Status
             };
 
             try
@@ -96,7 +65,7 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());
             }
             
-            return CreatedAtAction(nameof(GetOrderById), new { id = orderDto.OrderId }, orderDto);
+            return CreatedAtAction(nameof(GetOrderByUserId), new { id = orderDto.OrderId }, orderDto);
         }
     }
 }

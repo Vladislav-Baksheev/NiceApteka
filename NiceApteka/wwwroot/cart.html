@@ -24,22 +24,42 @@
                 <div class="title" id="enter">Вход</div>
                 <div class="bar"></div>
             </a>
+
+            <button onclick="openEditUser()"
+                    id="linkToProfile"
+                    style="width: 100px;
+                           font-size:25px;
+                            ">
+            </button>
+
             <button onclick="exit()" id="exitBtn">
                 <img src="https://i1.sndcdn.com/artworks-000415899078-osz220-t500x500.jpg"
                      style="
-                        width: 25px
+                        width: 25px;
                         " />
             </button>
         </div>
     </div>
 
-    <div id="wrapper">
-        <aside>
-            <ul id="categories">
-            </ul>
-        </aside>
-    </div>
+    <div id="orders-container"></div>
 
+    <div id="profileModal" class="modal">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="closeModal">&times;</span>
+                <h2>Профиль</h2>
+            </div>
+            <div class="modal-body">
+                <p>Адрес</p>
+                <input type="text" id="userAddressEdit" />
+                <p>Номер телефона</p>
+                <input type="text" id="userPhoneEdit" />
+                <button onclick="saveChangesUser()">Сохранить изменения</button>
+            </div>
+        </div>
+
+    </div>
 
     <script src="scripts.js"></script>
     <script type="text/javascript">

@@ -17,9 +17,9 @@ namespace NiceApteka.Controllers
 
         [Route("products")]
         [HttpGet]
-        public IActionResult GetProducts()
+        public async Task<ActionResult> GetProducts()
         {
-            var products = _db.Products.ToList();
+            var products = await _db.Products.ToListAsync();
 
             var productsDTO = new List<ProductDTO>();
 

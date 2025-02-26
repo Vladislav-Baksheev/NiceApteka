@@ -2,6 +2,10 @@
 const authCookieName = 'auth_cookie';
 let user = []; 
 
+let ProductId;
+
+let UserID;
+
 function init(){
     getProducts();
     let cookieName = getCookie(authCookieName);
@@ -12,6 +16,7 @@ function init(){
         document.getElementById('exitBtn').classList.remove('hidden');
         document.getElementById('enter').classList.add('hidden');
         document.getElementById('linkToProfile').innerText = user.name;
+        getUserId();
     }
     else {
         document.getElementById('enter').classList.remove('hidden');
@@ -23,6 +28,7 @@ function init(){
 //Получить товары
 function getProducts() {
     document.getElementById('products-container').innerHTML = '<div class="loader">Загрузка...</div>';
+
     fetch("products")
         .then(reponse => reponse.json())
         .then(data => _displayProducts(data))
@@ -34,6 +40,20 @@ function getUser() {
         .then(reponse => reponse.json())
         .then(data => _displayUserFields(data))
         .catch(error => console.error('Unable to get user.', error));
+}
+
+function getUserId() {
+    fetch("userByEmail/" + user.name)
+        .then(response => response.json())
+        .then(data => {
+            if (true) {
+                UserID = data.userId; 
+                console.log('User ID установлен:', UserID); 
+            } else {
+                console.error('ID пользователя не найден в ответе сервера');
+            }
+        })
+        .catch(error => console.error('Ошибка при получении ID пользователя:', error));
 }
 
 
@@ -80,9 +100,10 @@ function _displayProducts(data) {
         productPrice.textContent = product.price;
         productDescription.textContent = product.description;
         addToCartBtn.textContent = "Добавить в корзину";
-        addToCartBtn.addEventListener("click", addToCart, false)
-        editProductBtn.addEventListener("click", editProduct, false)
-        deleteProductBtn.addEventListener("click", deleteProduct, false)
+        addToCartBtn.dataset.productId = product.productId;
+        addToCartBtn.addEventListener("click", addToCart, false);
+        editProductBtn.addEventListener("click", editProduct, false);
+        deleteProductBtn.addEventListener("click", deleteProduct, false);
 
         editProductBtn.dataset.productId = product.productId;
         deleteProductBtn.dataset.productId = product.productId;
@@ -151,20 +172,28 @@ function deleteCookie(name) {
 
 var modal = document.getElementById('profileModal');
 var span = document.getElementById("closeModal");
+var spanProduct = document.getElementById("closeModalProduct");
 
 function openEditUser() {
     modal.style.display = "block";
+    
     getUser();
 }
 
 span.onclick = function () {
     modal.style.display = "none";
+
+}
+
+spanProduct.onclick = function () {
+    modalProduct.style.display = "none";
 }
 
 
 window.onclick = function (event) {
-    if (event.target == modal) {
+    if (event.target == modal || event.target == modalProduct) {
         modal.style.display = "none";
+        modalProduct.style.display = "none";
     }
 }
 
@@ -201,25 +230,60 @@ function saveChangesUser() {
         });
 }
 
-function addToCart() {
-    alert("Товар добавлен!")
+function addToCart(event) {
+    const productId = event.target.dataset.productId; // Получаем ID товара
+    const product = products.find(p => p.productId == productId); // Находим товар
+
+    if (!product) {
+        console.error('Товар не найден');
+        return;
+    }
+
+    const order = {
+        userId: UserID, // ID пользователя
+        productId: productId, // ID товара
+        quantity: 1, // Количество
+        price: product.price, // Цена товара
+        status: "pending" // Статус заказа
+    };
+
+    fetch(`/order/add`, { 
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(order)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка добавления товара в корзину');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Товар успешно добавлен в корзину!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            console.log('Ошибка при добавлении товара в корзину: ' + error.message);
+        });
 }
 
-let currentProductId = null;
-modal = document.getElementById('productModal');
+//let currentProductId = null;
+var modalProduct = document.getElementById('productModal');
 
 function editProduct(event) {
     const productId = event.target.dataset.productId;
-    document.getElementById('productId').value = productId;
+    //document.getElementById('productId').value = productId;
     const product = products.find(p => p.productId == productId);
 
-    //document.getElementById('productId').value = product.productId;
     document.getElementById('productNameEdit').value = product.name;
     document.getElementById('productPriceEdit').value = product.price;
     document.getElementById('productDescriptionEdit').value = product.description;
     document.getElementById('productPhotoEdit').value = product.imageUrl;
 
-    modal.style.display = 'block';
+    modalProduct.style.display = 'block';
+
+    ProductId = productId;
 }
 
 function deleteProduct(event) {
@@ -240,7 +304,7 @@ function deleteProduct(event) {
 
 function saveProductChanges() {
     const productData = {
-        productId: document.getElementById('productId').value,
+        productId: ProductId,
         name: document.getElementById('productNameEdit').value,
         price: document.getElementById('productPriceEdit').value,
         description: document.getElementById('productDescriptionEdit').value,
