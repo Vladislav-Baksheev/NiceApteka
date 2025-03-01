@@ -39,7 +39,7 @@ namespace NiceApteka.Controllers
 
         [Route("order/add")]
         [HttpPost]
-        public IActionResult AddOrder([FromBody]OrderDTO orderDto, [FromRoute] int userId)
+        public IActionResult AddOrder([FromBody]OrderDTO orderDto)
         {
             if (orderDto == null)
             {
@@ -48,7 +48,7 @@ namespace NiceApteka.Controllers
 
             var order = new Order
             {
-                UserId = userId,
+                UserId = orderDto.UserId,
                 ProductId = orderDto.ProductId,
                 Quantity = orderDto.Quantity,
                 Price = orderDto.Price,
