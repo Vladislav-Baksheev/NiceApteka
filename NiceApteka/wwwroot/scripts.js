@@ -6,6 +6,11 @@ let ProductId;
 
 let UserID;
 
+var modal = document.getElementById('profileModal');
+var modalProduct = document.getElementById('productModal');
+var span = document.getElementById("closeModal");
+var spanProduct = document.getElementById("closeModalProduct");
+
 function init(){
     getProducts();
     let cookieName = getCookie(authCookieName);
@@ -148,88 +153,6 @@ function _displayUserFields(userData) {
     phone.value = userData.phoneNumber || '';
 }
 
-//Получить куки с сайта, чтобы проверить авторизован ли еще чел
-function getCookie(name) {
-    const nameEQ = name + "=";
-    const ca = document.cookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
-
-//Выйти с аккаунта, удалив куки
-function exit() {
-    deleteCookie(authCookieName);
-    window.location.href = 'auth.html'
-}
-
-function deleteCookie(name) {
-    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-}
-
-var modal = document.getElementById('profileModal');
-var span = document.getElementById("closeModal");
-var spanProduct = document.getElementById("closeModalProduct");
-
-function openEditUser() {
-    modal.style.display = "block";
-    
-    getUser();
-}
-
-span.onclick = function () {
-    modal.style.display = "none";
-
-}
-
-spanProduct.onclick = function () {
-    modalProduct.style.display = "none";
-}
-
-
-window.onclick = function (event) {
-    if (event.target == modal || event.target == modalProduct) {
-        modal.style.display = "none";
-        modalProduct.style.display = "none";
-    }
-}
-
-function saveChangesUser() {
-    const address = document.getElementById("userAddressEdit").value;
-    const phone = document.getElementById("userPhoneEdit").value;
-    // Формируем объект для отправки
-    const userData = {
-        email: user.name, // Предполагая, что user.name содержит email
-        address: address,
-        phoneNumber: phone
-    };
-
-    // Отправляем PUT-запрос
-    fetch(`user/edit/${user.name}`, {
-        method: 'PUT',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData)
-    })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка сохранения');
-            return response.json();
-        })
-        .then(data => {
-            console.log('Изменения сохранены!');
-            modal.style.display = "none"; // Закрываем модалку
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            console.log('Ошибка при сохранении: ' + error.message);
-        });
-}
-
 function addToCart(event) {
     const productId = event.target.dataset.productId; // Получаем ID товара
     const product = products.find(p => p.productId == productId); // Находим товар
@@ -268,9 +191,8 @@ function addToCart(event) {
         });
 }
 
-//let currentProductId = null;
-var modalProduct = document.getElementById('productModal');
 
+// ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН НАЧИНАЕТСЯ ТУТ
 function editProduct(event) {
     const productId = event.target.dataset.productId;
     //document.getElementById('productId').value = productId;
@@ -324,4 +246,83 @@ function saveProductChanges() {
             getProducts(); // Обновляем список товаров
         })
         .catch(error => alert(error.message));
+}
+function openEditUser() {
+    modal.style.display = "block";
+
+    getUser();
+}
+
+span.onclick = function () {
+    modal.style.display = "none";
+
+}
+
+spanProduct.onclick = function () {
+    modalProduct.style.display = "none";
+}
+
+
+window.onclick = function (event) {
+    if (event.target == modal || event.target == modalProduct) {
+        modal.style.display = "none";
+        modalProduct.style.display = "none";
+    }
+}
+
+function saveChangesUser() {
+    const address = document.getElementById("userAddressEdit").value;
+    const phone = document.getElementById("userPhoneEdit").value;
+    // Формируем объект для отправки
+    const userData = {
+        email: user.name, // Предполагая, что user.name содержит email
+        address: address,
+        phoneNumber: phone
+    };
+
+    // Отправляем PUT-запрос
+    fetch(`user/edit/${user.name}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка сохранения');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Изменения сохранены!');
+            modal.style.display = "none"; // Закрываем модалку
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            console.log('Ошибка при сохранении: ' + error.message);
+        });
+}
+
+// ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН ЗАКАНЧИВАЕТСЯ ТУТ
+
+//Получить куки с сайта, чтобы проверить авторизован ли еще чел
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+//Выйти с аккаунта, удалив куки
+function exit() {
+    deleteCookie(authCookieName);
+    window.location.href = 'auth.html'
+}
+
+function deleteCookie(name) {
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
