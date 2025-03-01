@@ -8,8 +8,10 @@ let UserID;
 
 var modal = document.getElementById('profileModal');
 var modalProduct = document.getElementById('productModal');
+var modalAddProduct = document.getElementById('productAddModal');
 var span = document.getElementById("closeModal");
 var spanProduct = document.getElementById("closeModalProduct");
+var spanAddProduct = document.getElementById("closeModalAddProduct");
 
 function init(){
     getProducts();
@@ -21,6 +23,16 @@ function init(){
         document.getElementById('exitBtn').classList.remove('hidden');
         document.getElementById('enter').classList.add('hidden');
         document.getElementById('linkToProfile').innerText = user.name;
+        if (user.name == 'admin') {
+            let menu = document.getElementById('menuBlock');
+
+            var addProductBtn = document.createElement('button');
+
+            addProductBtn.addEventListener("click", openAddProduct, false);
+            addProductBtn.textContent = "Создать товар";
+
+            menu.appendChild(addProductBtn);
+        }
         getUserId();
     }
     else {
@@ -91,6 +103,7 @@ function _displayProducts(data) {
         var productDescription = document.createElement("p");
         var addToCartBtn = document.createElement("button");
         var editProductBtn = document.createElement("button");
+        var addProductBtn = document.createElement("button");
         var deleteProductBtn = document.createElement("button");
 
 
@@ -193,6 +206,33 @@ function addToCart(event) {
 
 
 // ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН НАЧИНАЕТСЯ ТУТ
+function openAddProduct() {
+    modalAddProduct.style.display = 'block';
+}
+
+function addProduct() {
+    const product = {
+        name: document.getElementById('productName').value,
+        price: document.getElementById('productPrice').value,
+        description: document.getElementById('productDescription').value,
+        imageUrl: document.getElementById('productPhoto').value
+    };
+
+    fetch(`product/add`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(product)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка сохранения');
+            modalAddProduct.style.display = 'none';
+            getProducts(); // Обновляем список товаров
+        })
+        .catch(error => alert(error.message));
+}
+
 function editProduct(event) {
     const productId = event.target.dataset.productId;
     //document.getElementById('productId').value = productId;
@@ -255,16 +295,17 @@ function openEditUser() {
 
 span.onclick = function () {
     modal.style.display = "none";
-
 }
 
 spanProduct.onclick = function () {
     modalProduct.style.display = "none";
 }
-
+spanAddProduct.onclick = function () {
+    modalAddProduct.style.display = "none";
+}
 
 window.onclick = function (event) {
-    if (event.target == modal || event.target == modalProduct) {
+    if (event.target == modal || event.target == modalProduct || modalAddProduct) {
         modal.style.display = "none";
         modalProduct.style.display = "none";
     }

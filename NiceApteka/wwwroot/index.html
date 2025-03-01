@@ -11,7 +11,7 @@
         <div class="logo">
             LOGO
         </div>
-        <div class="menu">
+        <div class="menu" id="menuBlock">
             <a href="index.html" class="link" id="linkToIndex">
                 <div class="title">Главная</div>
                 <div class="bar"></div>
@@ -88,6 +88,31 @@
                 <p>URL изображения</p>
                 <input type="text" id="productPhotoEdit">
                 <button onclick="saveProductChanges()">Сохранить</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="productAddModal" class="modal">
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="closeModalAddProduct">&times;</span>
+                <h2>Добавить товар</h2>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productId">
+                <p>Название</p>
+                <input type="text" id="productName">
+                <p>Категория</p>
+                <input type="text" id="productCategory" />
+                <p>Цена</p>
+                <input type="number" id="productPrice">
+                <p>Описание</p>
+                <textarea id="productDescription"></textarea>
+                <p>URL изображения</p>
+                <input type="text" id="productPhoto">
+                <button onclick="addProduct()">Сохранить</button>
             </div>
         </div>
 
