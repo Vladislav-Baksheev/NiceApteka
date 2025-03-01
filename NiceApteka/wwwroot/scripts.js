@@ -52,6 +52,18 @@ function getProducts() {
         .catch(error => console.error('Unable to get products.', error));
 }
 
+function getOrders() {
+    if (user.name == undefined) {
+        console.log("Email пользователя не определен");
+        return;
+    }
+
+    fetch(`order/${user.name}`)
+        .then(reponse => reponse.json())
+        .then(data => _displayOrders(data))
+        .catch(error => console.error('Unable to get orders.', error));
+}
+
 function getUser() {
     fetch("userByEmail/" + user.name)
         .then(reponse => reponse.json())
@@ -73,6 +85,52 @@ function getUserId() {
         .catch(error => console.error('Ошибка при получении ID пользователя:', error));
 }
 
+function _displayOrders(data) {
+    const container = document.getElementById('orders-container');
+
+    // Очищаем контейнер перед добавлением новых элементов
+    container.innerHTML = '';
+
+    data.forEach(order => {
+        const product = products.find(p => p.productId == order.productId);
+
+        // Создаем элементы для каждого заказа
+        const orderDiv = document.createElement("div");
+        orderDiv.className = "order-item";
+
+        // Название товара
+        const productName = document.createElement("div");
+        productName.className = "product-name";
+        productName.textContent = product.name || "Название товара не указано";
+
+        // Цена товара
+        const productPrice = document.createElement("div");
+        productPrice.className = "product-price";
+        productPrice.textContent = `Цена: ${order.price || 0} руб.`;
+
+        // Статус заказа
+        const orderStatus = document.createElement("div");
+        orderStatus.className = "order-status";
+        orderStatus.textContent = `Статус: ${order.status || "Не указан"}`;
+
+        // Кнопка "Оплатить"
+        const payButton = document.createElement("button");
+        payButton.className = "pay-button";
+        payButton.textContent = "Оплатить";
+        payButton.addEventListener("click", () => payOrder(order.orderId));
+
+        // Добавляем элементы в контейнер заказа
+        orderDiv.appendChild(productName);
+        orderDiv.appendChild(productPrice);
+        orderDiv.appendChild(orderStatus);
+        orderDiv.appendChild(payButton);
+
+        // Добавляем заказ в общий контейнер
+        container.appendChild(orderDiv);
+
+
+    });
+}
 
 //Вывести товары на сайт
 function _displayProducts(data) {
@@ -345,6 +403,27 @@ function saveChangesUser() {
 }
 
 // ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН ЗАКАНЧИВАЕТСЯ ТУТ
+
+function initCart() {
+    let cookieName = getCookie(authCookieName);
+    if (cookieName != null) {
+        user = {
+            name: cookieName
+        };
+        document.getElementById('exitBtn').classList.remove('hidden');
+        document.getElementById('enter').classList.add('hidden');
+        document.getElementById('linkToProfile').innerText = user.name;
+        
+        getUserId(); // todo: дожидаться выполнения функции
+        getOrders();
+    }
+    else {
+        document.getElementById('enter').classList.remove('hidden');
+        document.getElementById('exitBtn').classList.add('hidden');
+        document.getElementById('linkToProfile').classList.add('hidden');
+    }
+    
+}
 
 //Получить куки с сайта, чтобы проверить авторизован ли еще чел
 function getCookie(name) {

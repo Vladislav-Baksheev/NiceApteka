@@ -11,12 +11,12 @@
         <div class="logo">
             LOGO
         </div>
-        <div class="menu">
+        <div class="menu" id="menuBlock">
             <a href="index.html" class="link" id="linkToIndex">
                 <div class="title">Главная</div>
                 <div class="bar"></div>
             </a>
-            <a href="#" class="link">
+            <a href="cart.html" class="link">
                 <div class="title">Корзина</div>
                 <div class="bar"></div>
             </a>
@@ -28,20 +28,22 @@
             <button onclick="openEditUser()"
                     id="linkToProfile"
                     style="width: 100px;
-                           font-size:25px;
-                            ">
+                       font-size:25px;
+                        ">
             </button>
 
             <button onclick="exit()" id="exitBtn">
                 <img src="https://i1.sndcdn.com/artworks-000415899078-osz220-t500x500.jpg"
                      style="
-                        width: 25px;
-                        " />
+                    width: 25px;
+                    " />
             </button>
         </div>
     </div>
 
-    <div id="orders-container"></div>
+    <div id="orders-container">
+        <div id="orders-list"></div>
+    </div>
 
     <div id="profileModal" class="modal">
 
@@ -63,7 +65,7 @@
 
     <script src="scripts.js"></script>
     <script type="text/javascript">
-        init();
+        initCart();
     </script>
 </body>
 </html>

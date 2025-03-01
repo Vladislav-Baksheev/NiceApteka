@@ -10,6 +10,55 @@ html, body {
     display: none;
 }
 
+.orders-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+    .orders-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.product-name {
+    flex: 2;
+    font-size: 18px;
+    color: #333;
+}
+
+.product-price {
+    flex: 1;
+    text-align: right;
+    font-size: 16px;
+    color: #555;
+}
+
+.order-status {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    color: #777;
+}
+
+
 .menu {
     display: inline-block;
     padding: 5px 0;

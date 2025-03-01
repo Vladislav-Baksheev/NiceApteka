@@ -15,26 +15,36 @@ namespace NiceApteka.Controllers
             _db = db;
         }
 
-        [Route("order/{id}")]
+        [Route("order/{email}")]
         [HttpGet]
-        public IActionResult GetOrderByUserId([FromRoute] int id)
+        public IActionResult GetOrdersByUserEmail([FromRoute] string email)
         {
-            var order = _db.Orders.FirstOrDefault(p => p.UserId == id);
+            var user = _db.Users.FirstOrDefault(u => u.Email == email);
 
-            if (order == null)
+            var orders = _db.Orders.Where(p => p.UserId == user.UserId).ToList();
+
+            List<OrderDTO> ordersDTO = new();
+
+            foreach(var order in orders)
+            {
+                var orderItem = new OrderDTO
+                {
+                    UserId = order.UserId,
+                    ProductId = order.ProductId,
+                    Quantity = order.Quantity,
+                    Price = order.Price,
+                    Status = order.Status
+                };
+
+                ordersDTO.Add(orderItem);
+            }
+           
+            if (orders == null)
             {
                 return NotFound();
             }
 
-            var orderDTO = new OrderDTO
-            {
-                OrderId = order.OrderId,
-                Quantity = order.Quantity,
-                Price = order.Price,
-                Status = order.Status
-            };
-
-            return Ok(orderDTO);
+            return Ok(ordersDTO);
         }
 
         [Route("order/add")]
@@ -65,7 +75,7 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());
             }
             
-            return CreatedAtAction(nameof(GetOrderByUserId), new { id = orderDto.OrderId }, orderDto);
+            return CreatedAtAction(nameof(GetOrdersByUserEmail), new { id = orderDto.OrderId }, orderDto);
         }
     }
 }
