@@ -75,7 +75,7 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());
             }
             
-            return CreatedAtAction(nameof(GetOrdersByUserEmail), new { id = orderDto.OrderId }, orderDto);
+            return CreatedAtAction(nameof(AddOrder), new { id = orderDto.OrderId }, orderDto);
         }
     }
 }

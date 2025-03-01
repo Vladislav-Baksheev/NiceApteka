@@ -117,7 +117,7 @@ function _displayOrders(data) {
         const payButton = document.createElement("button");
         payButton.className = "pay-button";
         payButton.textContent = "Оплатить";
-        payButton.addEventListener("click", () => payOrder(order.orderId));
+        //payButton.addEventListener("click", () => payOrder(order.orderId));
 
         // Добавляем элементы в контейнер заказа
         orderDiv.appendChild(productName);
@@ -445,4 +445,18 @@ function exit() {
 
 function deleteCookie(name) {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+// Показываем каталог
+function showCatalog() {
+    document.getElementById('catalog-page').style.display = 'block';
+    document.getElementById('cart-page').style.display = 'none';
+    getProducts(); // Загружаем товары
+}
+
+// Показываем корзину
+function showCart() {
+    document.getElementById('catalog-page').style.display = 'none';
+    document.getElementById('cart-page').style.display = 'block';
+    getOrders(); // Загружаем заказы
 }
