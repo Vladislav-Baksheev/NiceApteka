@@ -29,6 +29,7 @@ namespace NiceApteka.Controllers
             {
                 var orderItem = new OrderDTO
                 {
+                    OrderId = order.OrderId,
                     UserId = order.UserId,
                     ProductId = order.ProductId,
                     Quantity = order.Quantity,
@@ -77,5 +78,23 @@ namespace NiceApteka.Controllers
             
             return CreatedAtAction(nameof(AddOrder), new { id = orderDto.OrderId }, orderDto);
         }
+
+        [HttpPut("order/pay/{orderId}")]
+        public IActionResult PayOrder(int orderId)
+        {
+            var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId);
+            if (order == null)
+            {
+                return NotFound("Заказ не найден");
+            }
+
+            // Обновляем статус заказа
+            order.Status = "Оплачен";
+            _db.SaveChanges();
+
+            return Ok(new { message = "Заказ успешно оплачен" });
+        }
+
+        //TODO: Добавить отмены товара
     }
 }

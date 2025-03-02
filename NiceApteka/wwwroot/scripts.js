@@ -92,6 +92,7 @@ function _displayOrders(data) {
     container.innerHTML = '';
 
     data.forEach(order => {
+        // TODO: изменить отображение для оплаченных товаров!!!
         const product = products.find(p => p.productId == order.productId);
 
         // Создаем элементы для каждого заказа
@@ -117,7 +118,7 @@ function _displayOrders(data) {
         const payButton = document.createElement("button");
         payButton.className = "pay-button";
         payButton.textContent = "Оплатить";
-        //payButton.addEventListener("click", () => payOrder(order.orderId));
+        payButton.addEventListener("click", () => payOrder(order.orderId));
 
         // Добавляем элементы в контейнер заказа
         orderDiv.appendChild(productName);
@@ -238,7 +239,7 @@ function addToCart(event) {
         productId: productId, // ID товара
         quantity: 1, // Количество
         price: product.price, // Цена товара
-        status: "pending" // Статус заказа
+        status: "Ожидает оплаты" // Статус заказа
     };
 
     fetch(`/order/add`, { 
@@ -363,9 +364,8 @@ spanAddProduct.onclick = function () {
 }
 
 window.onclick = function (event) {
-    if (event.target == modal || event.target == modalProduct || modalAddProduct) {
-        modal.style.display = "none";
-        modalProduct.style.display = "none";
+    if (event.target == modal) {
+        modal.style.display = "block";
     }
 }
 
@@ -404,25 +404,27 @@ function saveChangesUser() {
 
 // ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН ЗАКАНЧИВАЕТСЯ ТУТ
 
-function initCart() {
-    let cookieName = getCookie(authCookieName);
-    if (cookieName != null) {
-        user = {
-            name: cookieName
-        };
-        document.getElementById('exitBtn').classList.remove('hidden');
-        document.getElementById('enter').classList.add('hidden');
-        document.getElementById('linkToProfile').innerText = user.name;
-        
-        getUserId(); // todo: дожидаться выполнения функции
-        getOrders();
-    }
-    else {
-        document.getElementById('enter').classList.remove('hidden');
-        document.getElementById('exitBtn').classList.add('hidden');
-        document.getElementById('linkToProfile').classList.add('hidden');
-    }
-    
+function payOrder(orderId) {
+    if (!confirm("Вы уверены, что хотите оплатить этот заказ?")) return;
+
+    fetch(`/order/pay/${orderId}`, {
+        method: 'PUT', 
+        headers: {
+            'Content-Type': 'application/json', 
+        },
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка оплаты заказа');
+            return response.json();
+        })
+        .then(data => {
+            alert('Заказ успешно оплачен!');
+            getOrders(); // Обновляем список заказов
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при оплате заказа: ' + error.message);
+        });
 }
 
 //Получить куки с сайта, чтобы проверить авторизован ли еще чел
