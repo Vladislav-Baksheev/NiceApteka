@@ -120,11 +120,18 @@ function _displayOrders(data) {
         payButton.textContent = "Оплатить";
         payButton.addEventListener("click", () => payOrder(order.orderId));
 
+        // Кнопка "Удалить"
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "pay-button";
+        deleteButton.textContent = "Удалить";
+        deleteButton.addEventListener("click", () => deleteOrder(order.orderId));
+
         // Добавляем элементы в контейнер заказа
         orderDiv.appendChild(productName);
         orderDiv.appendChild(productPrice);
         orderDiv.appendChild(orderStatus);
         orderDiv.appendChild(payButton);
+        orderDiv.appendChild(deleteButton);
 
         // Добавляем заказ в общий контейнер
         container.appendChild(orderDiv);
@@ -425,6 +432,20 @@ function payOrder(orderId) {
             console.error('Error:', error);
             alert('Ошибка при оплате заказа: ' + error.message);
         });
+}
+
+function deleteOrder(orderId) {
+    if (!confirm('Вы уверены, что хотите удалить товар?')) return;
+
+    fetch(`/order/delete/${orderId}`, {
+        method: 'DELETE'
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка удаления');
+            
+            getOrders(); // Обновляем список товаров
+        })
+        .catch(error => alert(error.message));
 }
 
 //Получить куки с сайта, чтобы проверить авторизован ли еще чел

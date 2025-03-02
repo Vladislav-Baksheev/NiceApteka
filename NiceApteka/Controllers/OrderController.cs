@@ -95,6 +95,29 @@ namespace NiceApteka.Controllers
             return Ok(new { message = "Заказ успешно оплачен" });
         }
 
-        //TODO: Добавить отмены товара
+        [Route("order/delete/{id}")]
+        [HttpDelete]
+        public IActionResult DeleteOrder([FromRoute] int id)
+        {
+            var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
+
+            if (order == null)
+            {
+                return NotFound(new { message = "Order not found" });
+            }
+
+            try
+            {
+                _db.Orders.Remove(order);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+
+            return Ok(new { message = "Order is deleted" });
+        }
     }
 }
