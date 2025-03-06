@@ -1,6 +1,7 @@
 ﻿let products = [];
 const authCookieName = 'auth_cookie';
 let user = []; 
+let categories = [];
 
 let ProductId;
 
@@ -100,9 +101,13 @@ function _displayCategories(data) {
         var catergoryName = document.createElement('a');
 
         catergoryName.textContent = category.name;
+        
+        catergoryName.dataset.categoryId = category.categoryId;
+        catergoryName.addEventListener("click", filterByCategory, false);
 
         container.appendChild(catergoryName);
     });
+    categories = data;
 }
 
 function _displayOrders(data) {
@@ -290,15 +295,40 @@ function addToCart(event) {
         });
 }
 
+function filterByCategory(event) {
+    const categoryId = event.target.dataset.categoryId; // Получаем ID категории
+    //const category = categories.find(p => p.categoryId == categoryId); 
+
+    let newProducts = [];
+
+    products.forEach(product => {
+        if (product.categoryId == categoryId) {
+            newProducts.push(product);
+        }
+    });
+    _displayProducts(newProducts);
+}
 
 // ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН НАЧИНАЕТСЯ ТУТ
 function openAddProduct() {
     modalAddProduct.style.display = 'block';
+    let categorySelect = document.getElementById('productCategory'); 
+    categories.forEach(category => {
+        const newOption = new Option(category.name, category.name);
+
+        categorySelect.options.add(newOption);
+    });
+    
 }
 
 function addProduct() {
+    let index = document.getElementById('productCategory').selectedIndex;
+
+    let category = categories[index];
+
     const product = {
         name: document.getElementById('productName').value,
+        categoryId: category.categoryId,
         price: document.getElementById('productPrice').value,
         description: document.getElementById('productDescription').value,
         imageUrl: document.getElementById('productPhoto').value
@@ -492,14 +522,14 @@ function deleteCookie(name) {
 
 // Показываем каталог
 function showCatalog() {
-    document.getElementById('catalog-page').style.display = 'block';
+    document.getElementById('wrapper').style.display = 'flex';
     document.getElementById('cart-page').style.display = 'none';
     getProducts(); // Загружаем товары
 }
 
 // Показываем корзину
 function showCart() {
-    document.getElementById('catalog-page').style.display = 'none';
+    document.getElementById('wrapper').style.display = 'none';
     document.getElementById('cart-page').style.display = 'block';
     getOrders(); // Загружаем заказы
 }

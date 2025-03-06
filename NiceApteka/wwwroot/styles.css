@@ -126,12 +126,26 @@ html, body {
 #wrapper {
     display: flex;
     flex-direction: row;
+    width: 100%;
+    min-height: calc(100vh - 92px);
 }
 
-aside {
+.SideBarCategories {
+    width: 150px; /* Ширина боковой панели */
+    padding: 20px;
+    background-color: #f1f1f1; /* Цвет фона */
+    border-right: 1px solid #ddd; /* Граница справа */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Тень для разделения */
     
+    position: sticky; 
+    top: 0; /* Прилипает к верху */
+    overflow-y: auto; /* Добавляет прокрутку, если контент слишком длинный */
 }
-
+#catalog-page, #cart-page {
+    flex-grow: 1; /* Занимает оставшееся пространство */
+    padding: 20px;
+     
+}
 ul {
     list-style-type: none;
 }
@@ -173,6 +187,10 @@ ul {
 }
 #linkToProfile {
     border: none;
+}
+
+a{
+    cursor: pointer;
 }
 
 h1 {

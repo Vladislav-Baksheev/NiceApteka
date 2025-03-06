@@ -42,11 +42,14 @@
     </div>
 
     <div id="wrapper">
-        <aside>
+        <!-- Боковая панель с категориями -->
+        <div class="SideBarCategories">
             <ul id="categories">
+                <!-- Категории будут здесь -->
             </ul>
-        </aside>
-        <!-- Контейнер для каталога -->
+        </div>
+
+        <!-- Основной контент -->
         <div id="catalog-page">
             <div id="products-container"></div>
         </div>
@@ -115,7 +118,7 @@
                 <p>Название</p>
                 <input type="text" id="productName">
                 <p>Категория</p>
-                <input type="text" id="productCategory" />
+                <select type="text" id="productCategory"></select>
                 <p>Цена</p>
                 <input type="number" id="productPrice">
                 <p>Описание</p>

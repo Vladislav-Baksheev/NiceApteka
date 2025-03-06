@@ -37,7 +37,8 @@ namespace NiceApteka.Controllers
                     Description = product.Description,
                     Price = product.Price,
                     QuantityInStock = product.QuantityInStock,
-                    ImageUrl = product.ImageUrl
+                    ImageUrl = product.ImageUrl,
+                    CategoryId = product.CategoryId
                 };
 
                 productsDTO.Add(productDTO);
@@ -63,7 +64,8 @@ namespace NiceApteka.Controllers
                 Description = product.Description,
                 Price = product.Price,
                 QuantityInStock = product.QuantityInStock,
-                ImageUrl = product.ImageUrl
+                ImageUrl = product.ImageUrl,
+                CategoryId = product.CategoryId
             };
 
             return Ok(productDTO);
@@ -85,7 +87,8 @@ namespace NiceApteka.Controllers
                 Description = productDto.Description,
                 Price = productDto.Price,
                 QuantityInStock = productDto.QuantityInStock,
-                ImageUrl = productDto.ImageUrl
+                ImageUrl = productDto.ImageUrl,
+                CategoryId = productDto.CategoryId
             };
 
             try
@@ -142,6 +145,7 @@ namespace NiceApteka.Controllers
             product.Price = productDto.Price;
             product.Description = productDto.Description;
             product.ImageUrl = productDto.ImageUrl;
+            product.CategoryId = productDto.CategoryId;
 
             _db.SaveChanges();
 

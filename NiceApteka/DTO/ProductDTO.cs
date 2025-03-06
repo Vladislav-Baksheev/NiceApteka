@@ -16,4 +16,6 @@ public partial class ProductDTO
     public int QuantityInStock { get; set; }
 
     public string? ImageUrl { get; set; }
+
+    public int? CategoryId { get; set; }
 }
