@@ -1,7 +1,11 @@
 ﻿let products = [];
 const authCookieName = 'auth_cookie';
 let user = []; 
+
 let categories = [];
+
+let allProducts = []; // Исходный список товаров
+let filteredProducts = []; // Отфильтрованные товары
 
 let ProductId;
 
@@ -49,8 +53,12 @@ function getProducts() {
     document.getElementById('products-container').innerHTML = '<div class="loader">Загрузка...</div>';
 
     fetch("products")
-        .then(reponse => reponse.json())
-        .then(data => _displayProducts(data))
+        .then(response => response.json())
+        .then(data => {
+            allProducts = data; // Сохраняем исходные данные
+            filteredProducts = [...allProducts]; // Копируем для отображения
+            _displayProducts(filteredProducts); // Отображаем все товары
+        })
         .catch(error => console.error('Unable to get products.', error));
 }
 
@@ -99,13 +107,15 @@ function _displayCategories(data) {
 
     data.forEach(category => {
         var catergoryName = document.createElement('a');
+        var li = document.createElement('li');
 
         catergoryName.textContent = category.name;
         
         catergoryName.dataset.categoryId = category.categoryId;
         catergoryName.addEventListener("click", filterByCategory, false);
 
-        container.appendChild(catergoryName);
+        li.appendChild(catergoryName);
+        container.appendChild(li);
     });
     categories = data;
 }
@@ -299,13 +309,9 @@ function filterByCategory(event) {
     const categoryId = event.target.dataset.categoryId; // Получаем ID категории
     //const category = categories.find(p => p.categoryId == categoryId); 
 
-    let newProducts = [];
-
-    products.forEach(product => {
-        if (product.categoryId == categoryId) {
-            newProducts.push(product);
-        }
-    });
+    const newProducts = allProducts.filter(product => 
+        product.categoryId == categoryId
+    );
     _displayProducts(newProducts);
 }
 
@@ -354,6 +360,13 @@ function editProduct(event) {
     //document.getElementById('productId').value = productId;
     const product = products.find(p => p.productId == productId);
 
+    let categorySelect = document.getElementById('productCategoryEdit');
+    categories.forEach(category => {
+        const newOption = new Option(category.name, category.name);
+
+        categorySelect.options.add(newOption);
+    });
+
     document.getElementById('productNameEdit').value = product.name;
     document.getElementById('productPriceEdit').value = product.price;
     document.getElementById('productDescriptionEdit').value = product.description;
@@ -381,8 +394,13 @@ function deleteProduct(event) {
 }
 
 function saveProductChanges() {
+    let index = document.getElementById('productCategoryEdit').selectedIndex;
+
+    let category = categories[index];
+
     const productData = {
         productId: ProductId,
+        categoryId: category.categoryId,
         name: document.getElementById('productNameEdit').value,
         price: document.getElementById('productPriceEdit').value,
         description: document.getElementById('productDescriptionEdit').value,
