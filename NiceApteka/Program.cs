@@ -20,11 +20,12 @@ if (app.Environment.IsDevelopment())
     //app.UseSwagger();
     //app.UseSwaggerUI();
 }
-
-app.UseFileServer();
-
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
+
+app.UseFileServer();
 
 app.Run();

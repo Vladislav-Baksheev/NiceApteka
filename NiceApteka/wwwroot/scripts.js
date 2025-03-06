@@ -15,6 +15,7 @@ var spanAddProduct = document.getElementById("closeModalAddProduct");
 
 function init(){
     getProducts();
+    getCategories();
     let cookieName = getCookie(authCookieName);
     if (cookieName != null) {
         user = {
@@ -64,6 +65,13 @@ function getOrders() {
         .catch(error => console.error('Unable to get orders.', error));
 }
 
+function getCategories() {
+    fetch("categories")
+        .then(reponse => reponse.json())
+        .then(data => _displayCategories(data))
+        .catch(error => console.error('Unable to get products.', error));
+}
+
 function getUser() {
     fetch("userByEmail/" + user.name)
         .then(reponse => reponse.json())
@@ -83,6 +91,18 @@ function getUserId() {
             }
         })
         .catch(error => console.error('Ошибка при получении ID пользователя:', error));
+}
+
+function _displayCategories(data) {
+    const container = document.getElementById('categories');
+
+    data.forEach(category => {
+        var catergoryName = document.createElement('a');
+
+        catergoryName.textContent = category.name;
+
+        container.appendChild(catergoryName);
+    });
 }
 
 function _displayOrders(data) {
