@@ -136,7 +136,7 @@ html, body {
     background-color: #f1f1f1; /* Цвет фона */
     border-right: 1px solid #ddd; /* Граница справа */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Тень для разделения */
-    
+    font-size: large;
     position: sticky; 
     top: 0; /* Прилипает к верху */
     overflow-y: auto; /* Добавляет прокрутку, если контент слишком длинный */
@@ -253,62 +253,58 @@ button:hover
 
 /*НАЧАЛО БЛОКА МОДАЛЬНОГО ОКНА*/
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1; 
-    padding-top: 100px; 
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0); 
-    background-color: rgba(0,0,0,0.4); 
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.8); /* Темный фон с прозрачностью */
 }
-
 
 .modal-content {
     position: relative;
-    background-color: #E1BEE7;
+    background-color: #ffffff; /* Белый фон */
     margin: auto;
     padding: 0;
-    border: 5px solid #7B1FA2;
+    border: 2px solid #000000; /* Черная рамка */
     width: 50%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
-    animation-duration: 0.4s
+    animation-duration: 0.4s;
 }
-
 
 @-webkit-keyframes animatetop {
     from {
         top: -300px;
-        opacity: 0
+        opacity: 0;
     }
 
     to {
         top: 0;
-        opacity: 1
+        opacity: 1;
     }
 }
 
 @keyframes animatetop {
     from {
         top: -300px;
-        opacity: 0
+        opacity: 0;
     }
 
     to {
         top: 0;
-        opacity: 1
+        opacity: 1;
     }
 }
 
-
 .close {
-    color: white;
+    color: white; 
     float: right;
     font-size: 28px;
     font-weight: bold;
@@ -316,20 +312,23 @@ button:hover
 
     .close:hover,
     .close:focus {
-        color: #000;
+        color: #555555; /* Серый цвет при наведении */
         text-decoration: none;
         cursor: pointer;
     }
 
 .modal-header {
-    padding: 2px 16px;
-    background-color: #9C27B0;
-    color: white;
+    padding: 16px;
+    background-color: #000000; /* Черный фон для заголовка */
+    color: #ffffff; /* Белый текст */
+    border-bottom: 2px solid #000000; /* Черная граница */
 }
 
 .modal-body {
-    display: block;
-    padding: 2px 16px;
+    display: grid;
+    padding: 16px;
+    color: #000000; /* Черный текст */
+    background-color: #ffffff; /* Белый фон */
 }
 
 /*КОНЕЦ БЛОКА МОДАЛЬНОГО ОКНА*/

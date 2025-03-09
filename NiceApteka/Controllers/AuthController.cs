@@ -98,7 +98,18 @@ namespace NiceApteka.Controllers
             {
                 return BadRequest();
             }
-
+            if (!userDto.Email.Contains("@"))
+            {
+                throw new Exception("В почте отсутствует @");
+            }
+            if (_db.Users.Any(x => x.Email == userDto.Email))
+            {
+                throw new Exception("Почта занята");
+            }
+            if (userDto.PasswordHash.Length < 6)
+            {
+                throw new Exception("Пароль слишком короткий");
+            }
             var user = new User
             {
                 UserId = userDto.UserId,
@@ -117,7 +128,7 @@ namespace NiceApteka.Controllers
             {
                 Console.WriteLine(ex.ToString());   
             }
-            // TODO: не ловится ошибка, если пользователь с такой же почтой существует
+
             return CreatedAtAction(nameof(GetUserById), new { id = userDto.UserId }, userDto); 
         }
 
@@ -127,7 +138,10 @@ namespace NiceApteka.Controllers
         {
             var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email);
 
-            if (person is null) return Unauthorized();
+            if (person is null) 
+            {
+                return BadRequest();
+            }
 
             var isLogged = _passwordHasher.Verify(userDto.PasswordHash, person.PasswordHash);
 
@@ -135,8 +149,10 @@ namespace NiceApteka.Controllers
             {
                 return Ok(person.Email);
             }
-
-            return Unauthorized();
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [Route("user/edit/{email}")] 
