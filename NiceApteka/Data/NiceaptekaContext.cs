@@ -127,6 +127,9 @@ public partial class NiceaptekaContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .HasColumnName("phone_number");
+            entity.Property(e => e.Role)
+                .HasMaxLength(10)
+                .HasColumnName("role");
         });
 
         OnModelCreatingPartial(modelBuilder);

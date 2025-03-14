@@ -323,9 +323,8 @@ function openAddProduct() {
 }
 
 function addProduct() {
-    
     let index = document.getElementById('productCategory').selectedIndex;
-
+    const token = sessionStorage.getItem(tokenKey);
     let category = categories[index];
 
     const product = {
@@ -339,7 +338,8 @@ function addProduct() {
     fetch(`product/add`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token
         },
         body: JSON.stringify(product)
     })
@@ -378,11 +378,14 @@ function editProduct(event) {
 
 function deleteProduct(event) {
     if (!confirm('Вы уверены, что хотите удалить товар?')) return;
-
+    const token = sessionStorage.getItem(tokenKey);
     const productId = event.target.dataset.productId;
 
     fetch(`/product/delete/${productId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+            'Authorization': "Bearer " + token
+        },
     })
         .then(response => {
             if (!response.ok) throw new Error('Ошибка удаления');
@@ -394,7 +397,7 @@ function deleteProduct(event) {
 
 function saveProductChanges() {
     let index = document.getElementById('productCategoryEdit').selectedIndex;
-
+    const token = sessionStorage.getItem(tokenKey);
     let category = categories[index];
 
     const productData = {
@@ -409,7 +412,8 @@ function saveProductChanges() {
     fetch(`/product/edit/${productData.productId}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token
         },
         body: JSON.stringify(productData)
     })

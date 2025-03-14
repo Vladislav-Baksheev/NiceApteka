@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NiceApteka.Data;
 using NiceApteka.DTO;
@@ -71,6 +72,7 @@ namespace NiceApteka.Controllers
             return Ok(productDTO);
         }
 
+        [Authorize]
         [Route("product/add")]
         [HttpPost]
         public IActionResult AddProduct(ProductDTO productDto)
@@ -104,6 +106,7 @@ namespace NiceApteka.Controllers
             return CreatedAtAction(nameof(GetProductById), new { id = productDto.ProductId }, productDto);
         }
 
+        [Authorize]
         [Route("product/delete/{id}")]
         [HttpDelete]
         public IActionResult DeleteProduct([FromRoute] int id)
@@ -129,6 +132,7 @@ namespace NiceApteka.Controllers
             return Ok(new { message = "Product is deleted" });
         }
 
+        [Authorize(Roles ="admin")]
         [Route("product/edit/{id}")]
         [HttpPut]
         public IActionResult EditProduct([FromRoute] int id, [FromBody]ProductDTO productDto)
