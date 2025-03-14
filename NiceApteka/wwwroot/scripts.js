@@ -7,7 +7,6 @@ let allProducts = []; // Исходный список товаров
 let filteredProducts = []; // Отфильтрованные товары
 
 let ProductId;
-
 let UserID;
 
 var modal = document.getElementById('profileModal');
@@ -126,7 +125,6 @@ function _displayOrders(data) {
     container.innerHTML = '';
 
     data.forEach(order => {
-        // TODO: изменить отображение для оплаченных товаров!!!
         const product = products.find(p => p.productId == order.productId);
 
         // Создаем элементы для каждого заказа
@@ -169,8 +167,6 @@ function _displayOrders(data) {
 
         // Добавляем заказ в общий контейнер
         container.appendChild(orderDiv);
-
-
     });
 }
 
@@ -188,11 +184,11 @@ function _displayProducts(data) {
         var divPhoto = document.createElement("div");
         var divDescription = document.createElement("div");
 
-        //    <h2>Название</h2>
-        //    <h4>Категория</h4>
-        //    <h1>Цена</h1>
-        //    <p>Описание</p>
-        //    <button>Добавить в корзину</button>
+        // Название
+        // Категория
+        // Цена
+        // Описание
+        // Добавить в корзину
 
         //elements in div's
         var img = document.createElement("img");
@@ -203,7 +199,6 @@ function _displayProducts(data) {
         var productDescription = document.createElement("p");
         var addToCartBtn = document.createElement("button");
         var editProductBtn = document.createElement("button");
-        var addProductBtn = document.createElement("button");
         var deleteProductBtn = document.createElement("button");
 
 
@@ -214,7 +209,6 @@ function _displayProducts(data) {
         img.src = product.imageUrl;
 
         productName.textContent = product.name;
-        /*productCategory.textContent = ;*/
         productPrice.textContent = product.price;
         productDescription.textContent = product.description;
         addToCartBtn.textContent = "Добавить в корзину";
@@ -306,7 +300,6 @@ function addToCart(event) {
 
 function filterByCategory(event) {
     const categoryId = event.target.dataset.categoryId; // Получаем ID категории
-    //const category = categories.find(p => p.categoryId == categoryId); 
 
     const newProducts = allProducts.filter(product => 
         product.categoryId == categoryId
@@ -327,7 +320,6 @@ function openAddProduct() {
 
         categorySelect.options.add(newOption);
     });
-    
 }
 
 function addProduct() {
@@ -523,19 +515,7 @@ function deleteOrder(orderId) {
         .catch(error => alert(error.message));
 }
 
-//Получить куки с сайта, чтобы проверить авторизован ли еще чел
-function getCookie(name) {
-    const nameEQ = name + "=";
-    const ca = document.cookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
-
-//Выйти с аккаунта, удалив куки
+//Выйти с аккаунта
 function exit() {
     document.getElementById('enter').classList.remove('hidden');
     document.getElementById('exitBtn').classList.add('hidden');

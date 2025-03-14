@@ -162,7 +162,6 @@ namespace NiceApteka.Controllers
 
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                // формируем ответ
                 var response = new
                 {
                     access_token = encodedJwt,
