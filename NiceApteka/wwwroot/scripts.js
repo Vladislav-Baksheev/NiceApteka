@@ -1,7 +1,6 @@
 ﻿let products = [];
-const authCookieName = 'auth_cookie';
 let user = []; 
-
+var tokenKey = "accessToken";
 let categories = [];
 
 let allProducts = []; // Исходный список товаров
@@ -21,10 +20,10 @@ var spanAddProduct = document.getElementById("closeModalAddProduct");
 function init(){
     getProducts();
     getCategories();
-    let cookieName = getCookie(authCookieName);
-    if (cookieName != null) {
+    const email = sessionStorage.getItem("email");
+    if (email != null) {
         user = {
-            name: cookieName
+            name: email
         };
         document.getElementById('exitBtn').classList.remove('hidden');
         document.getElementById('enter').classList.add('hidden');
@@ -319,6 +318,10 @@ function filterByCategory(event) {
 function openAddProduct() {
     modalAddProduct.style.display = 'block';
     let categorySelect = document.getElementById('productCategory'); 
+    while (categorySelect.options.length > 0) {
+        categorySelect.remove(0);
+    }
+
     categories.forEach(category => {
         const newOption = new Option(category.name, category.name);
 
@@ -328,6 +331,7 @@ function openAddProduct() {
 }
 
 function addProduct() {
+    
     let index = document.getElementById('productCategory').selectedIndex;
 
     let category = categories[index];
@@ -361,6 +365,9 @@ function editProduct(event) {
     const product = products.find(p => p.productId == productId);
 
     let categorySelect = document.getElementById('productCategoryEdit');
+    while (categorySelect.options.length > 0) {
+        categorySelect.remove(0);
+    }
     categories.forEach(category => {
         const newOption = new Option(category.name, category.name);
 
@@ -530,12 +537,12 @@ function getCookie(name) {
 
 //Выйти с аккаунта, удалив куки
 function exit() {
-    deleteCookie(authCookieName);
-    window.location.href = 'auth.html'
-}
-
-function deleteCookie(name) {
-    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    document.getElementById('enter').classList.remove('hidden');
+    document.getElementById('exitBtn').classList.add('hidden');
+    document.getElementById('linkToProfile').classList.add('hidden');
+    sessionStorage.removeItem(tokenKey);
+    sessionStorage.removeItem("email");
+    window.location.href = 'index.html';
 }
 
 // Показываем каталог

@@ -11,20 +11,33 @@
         <div class="logo">
             LOGO
         </div>
-        <div class="menu">
-            <a href="index.html" class="link">
+        <div class="menu" id="menuBlock">
+            <a href="#" class="link" id="linkToIndex" onclick="showCatalog()">
                 <div class="title">Главная</div>
                 <div class="bar"></div>
             </a>
-            <a href="#" class="link">
+            <a href="#" class="link" id="linkToCart" onclick="showCart()">
                 <div class="title">Корзина</div>
                 <div class="bar"></div>
             </a>
-            <a href="#" class="link">
+            <a href="auth.html" class="link" id="linkToAuth">
                 <div class="title" id="enter">Вход</div>
-                <div class="title" id="user"></div>
                 <div class="bar"></div>
             </a>
+
+            <button onclick="openEditUser()"
+                    id="linkToProfile"
+                    style="width: 100px;
+                   font-size:25px;
+                    ">
+            </button>
+
+            <button onclick="exit()" id="exitBtn">
+                <img src="https://i1.sndcdn.com/artworks-000415899078-osz220-t500x500.jpg"
+                     style="
+                width: 25px;
+                " />
+            </button>
         </div>
     </div>
     <div id="authBlock" class="authBlock">

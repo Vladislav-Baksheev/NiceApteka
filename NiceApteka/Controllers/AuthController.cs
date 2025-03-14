@@ -2,12 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NiceApteka.Data;
 using NiceApteka.DTO;
 using NiceApteka.Models;
 using NiceApteka.Services;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 
 namespace NiceApteka.Controllers
 {
@@ -138,6 +141,7 @@ namespace NiceApteka.Controllers
         {
             var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email);
 
+            
             if (person is null) 
             {
                 return BadRequest();
@@ -145,14 +149,32 @@ namespace NiceApteka.Controllers
 
             var isLogged = _passwordHasher.Verify(userDto.PasswordHash, person.PasswordHash);
 
-            if (isLogged)
+            if (isLogged == true)
             {
-                return Ok(person.Email);
+                var claims = new List<Claim> { new Claim(ClaimTypes.Name, person.Email) };
+                // создаем JWT-токен
+                var jwt = new JwtSecurityToken(
+                        issuer: AuthOptions.ISSUER,
+                        audience: AuthOptions.AUDIENCE,
+                        claims: claims,
+                        expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+                        signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                // формируем ответ
+                var response = new
+                {
+                    access_token = encodedJwt,
+                    username = person.Email
+                };
+                return Ok(response);
             }
             else
             {
-                return BadRequest();
+                return Unauthorized();
             }
+            
         }
 
         [Route("user/edit/{email}")] 

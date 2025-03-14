@@ -1,14 +1,19 @@
 ﻿const authCookieName = 'auth_cookie';
 let user;
+var tokenKey = "accessToken";
+
 function init() {
-    let cookieName = getCookie(authCookieName);
-    if (cookieName != null) {
+    document.getElementById('exitBtn').classList.add('hidden');
+    document.getElementById('linkToProfile').classList.add('hidden');
+    document.getElementById('enter').classList.remove('hidden');
+    const email = sessionStorage.getItem("email");
+    if (email != null) {
         user = {
-            name: cookieName
+            name: email
         };
         document.getElementById('enter').classList.remove('hidden');
         document.getElementById('enter').innerText = user.name;
-        window.location.href ='index.html'
+        
     }
 }
 
@@ -31,7 +36,7 @@ function switchToLogin() {
 }
 
 //Вход
-function login() {
+async function login() {
     const addEmailTextbox = document.getElementById('loginEmail'); 
     const addPassTextbox = document.getElementById('loginPass'); 
 
@@ -40,18 +45,30 @@ function login() {
         PasswordHash: addPassTextbox.value.trim()
     }
 
-    fetch("auth/user", {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(user)
-    })
-        .then(response => response.json())
-        .then(setCookie(authCookieName, user.Email, 1))
-        .then(window.location.href = 'auth.html')
-        .catch(error => console.error('Unable to login.', error));
+    const response = await fetch("auth/user", {
+        method: "POST",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email: user.Email,
+            PasswordHash: user.PasswordHash
+        })
+    });
+    if (response.ok === true) {
+        // получаем данные
+        const data = await response.json();
+        // изменяем содержимое и видимость блоков на странице
+        document.getElementById('exitBtn').classList.remove('hidden');
+        document.getElementById('enter').classList.add('hidden');
+        document.getElementById('linkToProfile').classList.remove('hidden');
+        document.getElementById('linkToProfile').innerText = user.Email;
+        
+        // сохраняем в хранилище sessionStorage токен доступа
+        sessionStorage.setItem(tokenKey, data.access_token);
+        sessionStorage.setItem("email", user.Email);
+        window.location.href = 'index.html';
+    }
+    else  // если произошла ошибка, получаем код статуса
+        console.log("Status: ", response.status);
 }
 
 //Регистрация
@@ -82,7 +99,7 @@ function register() {
     }
 }
 
-//Добавить куки на сайт
+//Добавить куки на сайт (МОЖНО УДАЛИТЬ, УЖЕ НЕ ИСПОЛЬЗУЕТСЯ!!!)
 function setCookie(name, value, days) {
     let expires = "";
     if (days) {
@@ -93,12 +110,12 @@ function setCookie(name, value, days) {
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
 }
 
-//Удалить куки с сайта для выхода
+//Удалить куки с сайта для выхода (МОЖНО УДАЛИТЬ, УЖЕ НЕ ИСПОЛЬЗУЕТСЯ!!!)
 function deleteCookie(name) {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
-//Получить куки с сайта, чтобы проверить авторизован ли еще чел
+//Получить куки с сайта, чтобы проверить авторизован ли еще чел (МОЖНО УДАЛИТЬ, УЖЕ НЕ ИСПОЛЬЗУЕТСЯ!!!)
 function getCookie(name) {
     const nameEQ = name + "=";
     const ca = document.cookie.split(';');
@@ -110,7 +127,7 @@ function getCookie(name) {
     return null;
 }
 
-//Шифрование куки
+//Шифрование куки (МОЖНО УДАЛИТЬ, УЖЕ НЕ ИСПОЛЬЗУЕТСЯ!!!)
 function uuidv4() {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
         (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
