@@ -151,7 +151,11 @@ namespace NiceApteka.Controllers
 
             if (isLogged == true)
             {
-                var claims = new List<Claim> { new Claim(ClaimTypes.Name, person.Email) };
+                var claims = new List<Claim> 
+                { 
+                    new Claim(ClaimTypes.Name, person.Email),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role)
+                };
                 // создаем JWT-токен
                 var jwt = new JwtSecurityToken(
                         issuer: AuthOptions.ISSUER,

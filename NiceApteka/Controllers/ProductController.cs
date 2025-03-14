@@ -72,7 +72,7 @@ namespace NiceApteka.Controllers
             return Ok(productDTO);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [Route("product/add")]
         [HttpPost]
         public IActionResult AddProduct(ProductDTO productDto)
@@ -106,7 +106,7 @@ namespace NiceApteka.Controllers
             return CreatedAtAction(nameof(GetProductById), new { id = productDto.ProductId }, productDto);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [Route("product/delete/{id}")]
         [HttpDelete]
         public IActionResult DeleteProduct([FromRoute] int id)
