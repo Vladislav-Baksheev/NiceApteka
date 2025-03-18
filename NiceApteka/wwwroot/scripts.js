@@ -16,9 +16,15 @@ var span = document.getElementById("closeModal");
 var spanProduct = document.getElementById("closeModalProduct");
 var spanAddProduct = document.getElementById("closeModalAddProduct");
 
-function init(){
-    getProducts();
-    getCategories();
+function init() {
+    getCategories()
+        .then(() => getProducts())
+        .catch(error => {
+            console.error('Error loading data:', error);
+
+            document.getElementById('products-container').innerHTML = '<div class="error">Ошибка загрузки данных</div>';
+        });
+    
     const email = sessionStorage.getItem("email");
     if (email != null) {
         user = {
@@ -50,7 +56,7 @@ function init(){
 function getProducts() {
     document.getElementById('products-container').innerHTML = '<div class="loader">Загрузка...</div>';
 
-    fetch("products")
+    return fetch("products")
         .then(response => response.json())
         .then(data => {
             allProducts = data; // Сохраняем исходные данные
@@ -73,10 +79,11 @@ function getOrders() {
 }
 
 function getCategories() {
-    fetch("categories")
+
+    return fetch("categories")
         .then(reponse => reponse.json())
         .then(data => _displayCategories(data))
-        .catch(error => console.error('Unable to get products.', error));
+        .catch(error => console.error('Unable to get categories.', error));
 }
 
 function getUser() {
@@ -181,7 +188,9 @@ function _displayProducts(data) {
     data.forEach(product => {
         //div's
         var divCard = document.createElement("div");
+        var divCardItems = document.createElement("div");
         var divPhoto = document.createElement("div");
+        var divButtons = document.createElement("div");
         var divDescription = document.createElement("div");
 
         // Название
@@ -205,11 +214,15 @@ function _displayProducts(data) {
         divCard.className = "card";
         divPhoto.className = "photo";
         divDescription.className = "description";
+        divCardItems.className = "cardItems";
+        divButtons.className = "descriptionButtons";
 
         img.src = product.imageUrl;
 
         productName.textContent = product.name;
-        productPrice.textContent = product.price;
+        productPrice.textContent = product.price + ' ₽';
+        let category = categories.find(category => category.categoryId == product.categoryId);
+        productCategory.textContent = category.name;
         productDescription.textContent = product.description;
         addToCartBtn.textContent = "Добавить в корзину";
         addToCartBtn.dataset.productId = product.productId;
@@ -223,18 +236,23 @@ function _displayProducts(data) {
         divPhoto.appendChild(img);
         divDescription.appendChild(productName);
         divDescription.appendChild(productPrice);
+        divDescription.appendChild(productCategory);
         divDescription.appendChild(productDescription);
-        divDescription.appendChild(addToCartBtn);
+        divButtons.appendChild(addToCartBtn);
+        
         if (user.name == "admin") {
             editProductBtn.textContent = "Изменить товар";
             deleteProductBtn.textContent = "Удалить товар";
 
-            divDescription.appendChild(editProductBtn);
-            divDescription.appendChild(deleteProductBtn);
+            divButtons.appendChild(editProductBtn);
+            divButtons.appendChild(deleteProductBtn);
         }
-        divCard.appendChild(divPhoto);
-        divCard.appendChild(divDescription);
-
+        divDescription.appendChild(divButtons);
+        divCardItems.appendChild(divPhoto);
+        divCardItems.appendChild(divDescription);
+        divCard.appendChild(divCardItems);
+       
+        
         container.appendChild(divCard);
     });
     products = data;
