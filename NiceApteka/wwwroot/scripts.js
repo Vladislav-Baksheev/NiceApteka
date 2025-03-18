@@ -443,9 +443,15 @@ spanAddProduct.onclick = function () {
 
 window.onclick = function (event) {
     if (event.target == modal) {
-        modal.style.display = "block";
+        modal.style.display = "none"; // Закрываем окно вместо открытия
     }
-}
+    if (event.target == modalProduct) {
+        modalProduct.style.display = "none";
+    }
+    if (event.target == modalAddProduct) {
+        modalAddProduct.style.display = "none";
+    }
+};
 
 function saveChangesUser() {
     const address = document.getElementById("userAddressEdit").value;

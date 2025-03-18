@@ -96,5 +96,6 @@ function register() {
         })
             .then(response => response.json())
             .catch(error => console.error('Unable to register.', error));
+        switchToLogin();
     }
 }

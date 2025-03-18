@@ -9,6 +9,7 @@ public partial class NiceaptekaContext : DbContext
 {
     public NiceaptekaContext()
     {
+        Database.EnsureCreated();
     }
 
     public NiceaptekaContext(DbContextOptions<NiceaptekaContext> options)
