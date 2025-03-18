@@ -42,8 +42,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseWebSockets();
-
 app.UseFileServer();
 
 app.Run();
