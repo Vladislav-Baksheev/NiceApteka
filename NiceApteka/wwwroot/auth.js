@@ -1,6 +1,6 @@
 ﻿const authCookieName = 'auth_cookie';
 let user;
-var tokenKey = "accessToken";
+let tokenKey = "accessToken";
 
 function init() {
     document.getElementById('exitBtn').classList.add('hidden');

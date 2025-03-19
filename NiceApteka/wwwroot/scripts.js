@@ -1,6 +1,6 @@
 ﻿let products = [];
-let user = []; 
-var tokenKey = "accessToken";
+let user = [];
+let tokenKey = "accessToken";
 let categories = [];
 
 let allProducts = []; // Исходный список товаров
@@ -9,12 +9,12 @@ let filteredProducts = []; // Отфильтрованные товары
 let ProductId;
 let UserID;
 
-var modal = document.getElementById('profileModal');
-var modalProduct = document.getElementById('productModal');
-var modalAddProduct = document.getElementById('productAddModal');
-var span = document.getElementById("closeModal");
-var spanProduct = document.getElementById("closeModalProduct");
-var spanAddProduct = document.getElementById("closeModalAddProduct");
+let modal = document.getElementById('profileModal');
+let modalProduct = document.getElementById('productModal');
+let modalAddProduct = document.getElementById('productAddModal');
+let span = document.getElementById("closeModal");
+let spanProduct = document.getElementById("closeModalProduct");
+let spanAddProduct = document.getElementById("closeModalAddProduct");
 
 function init() {
     getCategories()
@@ -24,7 +24,7 @@ function init() {
 
             document.getElementById('products-container').innerHTML = '<div class="error">Ошибка загрузки данных</div>';
         });
-    
+
     const email = sessionStorage.getItem("email");
     if (email != null) {
         user = {
@@ -33,10 +33,10 @@ function init() {
         document.getElementById('exitBtn').classList.remove('hidden');
         document.getElementById('enter').classList.add('hidden');
         document.getElementById('linkToProfile').innerText = user.name;
-        if (user.name == 'admin') {
+        if (user.name === 'admin') {
             let menu = document.getElementById('menuBlock');
 
-            var addProductBtn = document.createElement('button');
+            let addProductBtn = document.createElement('button');
 
             addProductBtn.addEventListener("click", openAddProduct, false);
             addProductBtn.textContent = "Создать товар";
@@ -44,8 +44,7 @@ function init() {
             menu.appendChild(addProductBtn);
         }
         getUserId();
-    }
-    else {
+    } else {
         document.getElementById('enter').classList.remove('hidden');
         document.getElementById('exitBtn').classList.add('hidden');
         document.getElementById('linkToProfile').classList.add('hidden');
@@ -67,13 +66,13 @@ function getProducts() {
 }
 
 function getOrders() {
-    if (user.name == undefined) {
+    if (user.name === undefined) {
         console.log("Email пользователя не определен");
         return;
     }
 
     fetch(`order/${user.name}`)
-        .then(reponse => reponse.json())
+        .then(response => response.json())
         .then(data => _displayOrders(data))
         .catch(error => console.error('Unable to get orders.', error));
 }
@@ -81,14 +80,14 @@ function getOrders() {
 function getCategories() {
 
     return fetch("categories")
-        .then(reponse => reponse.json())
+        .then(response => response.json())
         .then(data => _displayCategories(data))
         .catch(error => console.error('Unable to get categories.', error));
 }
 
 function getUser() {
     fetch("userByEmail/" + user.name)
-        .then(reponse => reponse.json())
+        .then(response => response.json())
         .then(data => _displayUserFields(data))
         .catch(error => console.error('Unable to get user.', error));
 }
@@ -97,12 +96,8 @@ function getUserId() {
     fetch("userByEmail/" + user.name)
         .then(response => response.json())
         .then(data => {
-            if (true) {
-                UserID = data.userId; 
-                console.log('User ID установлен:', UserID); 
-            } else {
-                console.error('ID пользователя не найден в ответе сервера');
-            }
+            UserID = data.userId;
+            console.log('User ID установлен:', UserID);
         })
         .catch(error => console.error('Ошибка при получении ID пользователя:', error));
 }
@@ -111,15 +106,15 @@ function _displayCategories(data) {
     const container = document.getElementById('categories');
 
     data.forEach(category => {
-        var catergoryName = document.createElement('a');
-        var li = document.createElement('li');
+        let categoryName = document.createElement('a');
+        let li = document.createElement('li');
 
-        catergoryName.textContent = category.name;
-        
-        catergoryName.dataset.categoryId = category.categoryId;
-        catergoryName.addEventListener("click", filterByCategory, false);
+        categoryName.textContent = category.name;
 
-        li.appendChild(catergoryName);
+        categoryName.dataset.categoryId = category.categoryId;
+        categoryName.addEventListener("click", filterByCategory, false);
+
+        li.appendChild(categoryName);
         container.appendChild(li);
     });
     categories = data;
@@ -132,7 +127,7 @@ function _displayOrders(data) {
     container.innerHTML = '';
 
     data.forEach(order => {
-        const product = products.find(p => p.productId == order.productId);
+        const product = products.find(p => p.productId === order.productId);
 
         // Создаем элементы для каждого заказа
         const orderDiv = document.createElement("div");
@@ -186,29 +181,23 @@ function _displayProducts(data) {
     container.innerHTML = '';
 
     data.forEach(product => {
-        //div's
-        var divCard = document.createElement("div");
-        var divCardItems = document.createElement("div");
-        var divPhoto = document.createElement("div");
-        var divButtons = document.createElement("div");
-        var divDescription = document.createElement("div");
+        //div
+        let divCard = document.createElement("div");
+        let divPhoto = document.createElement("div");
+        let divButtons = document.createElement("div");
+        let divCardItems = document.createElement("div");
+        let divDescription = document.createElement("div");
 
-        // Название
-        // Категория
-        // Цена
-        // Описание
-        // Добавить в корзину
+        //elements in div
+        let img = document.createElement("img");
 
-        //elements in div's
-        var img = document.createElement("img");
-
-        var productName = document.createElement("h2");
-        var productCategory = document.createElement("h4");
-        var productPrice = document.createElement("h1");
-        var productDescription = document.createElement("p");
-        var addToCartBtn = document.createElement("button");
-        var editProductBtn = document.createElement("button");
-        var deleteProductBtn = document.createElement("button");
+        let productName = document.createElement("h2");
+        let productCategory = document.createElement("h4");
+        let productPrice = document.createElement("h1");
+        let productDescription = document.createElement("p");
+        let addToCartBtn = document.createElement("button");
+        let editProductBtn = document.createElement("button");
+        let deleteProductBtn = document.createElement("button");
 
 
         divCard.className = "card";
@@ -221,7 +210,7 @@ function _displayProducts(data) {
 
         productName.textContent = product.name;
         productPrice.textContent = product.price + ' ₽';
-        let category = categories.find(category => category.categoryId == product.categoryId);
+        let category = categories.find(category => category.categoryId === product.categoryId);
         productCategory.textContent = category.name;
         productDescription.textContent = product.description;
         addToCartBtn.textContent = "Добавить в корзину";
@@ -239,8 +228,8 @@ function _displayProducts(data) {
         divDescription.appendChild(productCategory);
         divDescription.appendChild(productDescription);
         divButtons.appendChild(addToCartBtn);
-        
-        if (user.name == "admin") {
+
+        if (user.name === "admin") {
             editProductBtn.textContent = "Изменить товар";
             deleteProductBtn.textContent = "Удалить товар";
 
@@ -251,8 +240,8 @@ function _displayProducts(data) {
         divCardItems.appendChild(divPhoto);
         divCardItems.appendChild(divDescription);
         divCard.appendChild(divCardItems);
-       
-        
+
+
         container.appendChild(divCard);
     });
     products = data;
@@ -280,7 +269,7 @@ function _displayUserFields(userData) {
 
 function addToCart(event) {
     const productId = event.target.dataset.productId; // Получаем ID товара
-    const product = products.find(p => p.productId == productId); // Находим товар
+    const product = products.find(p => p.productId === productId); // Находим товар
 
     if (!product) {
         console.error('Товар не найден');
@@ -295,7 +284,7 @@ function addToCart(event) {
         status: "Ожидает оплаты" // Статус заказа
     };
 
-    fetch(`/order/add`, { 
+    fetch(`/order/add`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -307,7 +296,7 @@ function addToCart(event) {
             if (!response.ok) throw new Error('Ошибка добавления товара в корзину');
             return response.json();
         })
-        .then(data => {
+        .then(() => {
             console.log('Товар успешно добавлен в корзину!');
         })
         .catch(error => {
@@ -319,16 +308,16 @@ function addToCart(event) {
 function filterByCategory(event) {
     const categoryId = event.target.dataset.categoryId; // Получаем ID категории
 
-    const newProducts = allProducts.filter(product => 
+    const newProducts = allProducts.filter(product =>
         product.categoryId == categoryId
     );
     _displayProducts(newProducts);
 }
 
-// ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН НАЧИНАЕТСЯ ТУТ
+// ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ, ОКОН НАЧИНАЕТСЯ ТУТ
 function openAddProduct() {
     modalAddProduct.style.display = 'block';
-    let categorySelect = document.getElementById('productCategory'); 
+    let categorySelect = document.getElementById('productCategory');
     while (categorySelect.options.length > 0) {
         categorySelect.remove(0);
     }
@@ -372,7 +361,7 @@ function addProduct() {
 function editProduct(event) {
     const productId = event.target.dataset.productId;
     //document.getElementById('productId').value = productId;
-    const product = products.find(p => p.productId == productId);
+    const product = products.find(p => p.productId === productId);
 
     let categorySelect = document.getElementById('productCategoryEdit');
     while (categorySelect.options.length > 0) {
@@ -437,11 +426,12 @@ function saveProductChanges() {
     })
         .then(response => {
             if (!response.ok) throw new Error('Ошибка сохранения');
-            productModal.style.display = 'none';
+            modalProduct.style.display = 'none';
             getProducts(); // Обновляем список товаров
         })
         .catch(error => alert(error.message));
 }
+
 function openEditUser() {
     modal.style.display = "block";
 
@@ -460,13 +450,13 @@ spanAddProduct.onclick = function () {
 }
 
 window.onclick = function (event) {
-    if (event.target == modal) {
+    if (event.target === modal) {
         modal.style.display = "none"; // Закрываем окно вместо открытия
     }
-    if (event.target == modalProduct) {
+    if (event.target === modalProduct) {
         modalProduct.style.display = "none";
     }
-    if (event.target == modalAddProduct) {
+    if (event.target === modalAddProduct) {
         modalAddProduct.style.display = "none";
     }
 };
@@ -494,9 +484,9 @@ function saveChangesUser() {
             if (!response.ok) throw new Error('Ошибка сохранения');
             return response.json();
         })
-        .then(data => {
+        .then(() => {
             console.log('Изменения сохранены!');
-            modal.style.display = "none"; // Закрываем модалку
+            modal.style.display = "none"; // Закрываем модальные окна
         })
         .catch(error => {
             console.error('Error:', error);
@@ -504,22 +494,22 @@ function saveChangesUser() {
         });
 }
 
-// ВСЕ ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН ЗАКАНЧИВАЕТСЯ ТУТ
+// ВСЕ, ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН, ЗАКАНЧИВАЕТСЯ ТУТ
 
 function payOrder(orderId) {
     if (!confirm("Вы уверены, что хотите оплатить этот заказ?")) return;
 
     fetch(`/order/pay/${orderId}`, {
-        method: 'PUT', 
+        method: 'PUT',
         headers: {
-            'Content-Type': 'application/json', 
+            'Content-Type': 'application/json',
         },
     })
         .then(response => {
             if (!response.ok) throw new Error('Ошибка оплаты заказа');
             return response.json();
         })
-        .then(data => {
+        .then(() => {
             alert('Заказ успешно оплачен!');
             getOrders(); // Обновляем список заказов
         })
@@ -537,7 +527,7 @@ function deleteOrder(orderId) {
     })
         .then(response => {
             if (!response.ok) throw new Error('Ошибка удаления');
-            
+
             getOrders(); // Обновляем список товаров
         })
         .catch(error => alert(error.message));
