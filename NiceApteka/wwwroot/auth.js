@@ -67,12 +67,15 @@ async function login() {
         sessionStorage.setItem("email", user.Email);
         window.location.href = 'index.html';
     }
-    else  // если произошла ошибка, получаем код статуса
-        console.log("Status: ", response.status);
+    else{
+        const data = await response.json();
+        alert('Ошибка: ' + data.Message);
+    }
+        
 }
 
 //Регистрация
-function register() {
+async function register() {
     const registerEmailTextbox = document.getElementById('registerEmail');
     const registerPassTextbox = document.getElementById('registerPassword');
     const repeatRegisterPassTextbox = document.getElementById('repeatRegisterPassword');
@@ -86,7 +89,7 @@ function register() {
             PasswordHash: registerPassTextbox.value.trim()
         }
 
-        fetch("register/user", {
+        const response = await fetch("register/user", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -94,8 +97,13 @@ function register() {
             },
             body: JSON.stringify(user)
         })
-            .then(response => response.json())
-            .catch(error => console.error('Unable to register.', error));
-        switchToLogin();
+        if (response.ok === true) {
+            alert('Вы зарегистрировались!');
+            switchToLogin();
+        }
+        else{
+            const data = await response.json();
+            alert('Ошибка: ' + data.Message);
+        }
     }
 }

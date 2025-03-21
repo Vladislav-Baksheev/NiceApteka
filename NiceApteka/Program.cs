@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NiceApteka.Data;
+using NiceApteka.Middlewares;
 using NiceApteka.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,11 +38,14 @@ if (app.Environment.IsDevelopment())
     //app.UseSwagger();
     //app.UseSwaggerUI();
 }
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.UseFileServer();
+
+
 
 app.Run();

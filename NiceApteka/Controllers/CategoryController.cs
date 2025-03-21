@@ -23,11 +23,6 @@ namespace NiceApteka.Controllers
 
             var categoriesDTO = new List<CategoryDTO>();
 
-            if (categories == null)
-            {
-                return NotFound();
-            }
-
             foreach (var category in categories)
             {
                 var categoryDTO = new CategoryDTO
@@ -40,26 +35,6 @@ namespace NiceApteka.Controllers
             }
 
             return Ok(categoriesDTO);
-        }
-
-        [Route("category/{id}")]
-        [HttpGet]
-        public IActionResult GetCategoryById([FromRoute] int id)
-        {
-            var category = _db.Categories.FirstOrDefault(p => p.CategoryId == id);
-
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            var categoryDTO = new CategoryDTO
-            {
-                CategoryId = category.CategoryId,
-                Name = category.Name
-            };
-
-            return Ok(categoryDTO);
         }
     }
 }

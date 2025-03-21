@@ -24,11 +24,6 @@ namespace NiceApteka.Controllers
 
             var productsDTO = new List<ProductDTO>();
 
-            if (products == null)
-            {
-                return NotFound();
-            }
-
             foreach (var product in products)
             {
                 var productDTO = new ProductDTO
@@ -55,7 +50,7 @@ namespace NiceApteka.Controllers
             var product = _db.Products.FirstOrDefault(p => p.ProductId == id);
             if (product == null)
             {
-                return NotFound();
+                throw new Exception("Товар не найден!");
             }
 
             var productDTO = new ProductDTO
@@ -77,11 +72,6 @@ namespace NiceApteka.Controllers
         [HttpPost]
         public IActionResult AddProduct(ProductDTO productDto)
         {
-            if (productDto == null)
-            {
-                return BadRequest();
-            }
-
             var product = new Product
             {
                 ProductId = productDto.ProductId,
@@ -98,9 +88,9 @@ namespace NiceApteka.Controllers
                 _db.Products.Add(product);
                 _db.SaveChanges();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.ToString());
+                throw new Exception("Ошибка добавления товара!");
             }
             
             return CreatedAtAction(nameof(GetProductById), new { id = productDto.ProductId }, productDto);
@@ -123,13 +113,13 @@ namespace NiceApteka.Controllers
                 _db.Products.Remove(product);
                 _db.SaveChanges();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.ToString());
+                throw new Exception("Ошибка удаления товара!");
             }
             
 
-            return Ok(new { message = "Product is deleted" });
+            return Ok(new { message = "Товар удален!" });
         }
 
         [Authorize(Roles ="admin")]
@@ -141,7 +131,7 @@ namespace NiceApteka.Controllers
 
             if (product == null)
             {
-                return NotFound("Товар не найден");
+                throw new Exception("Товар не найден!");
             }
 
             // Обновление полей
@@ -153,7 +143,7 @@ namespace NiceApteka.Controllers
 
             _db.SaveChanges();
 
-            return Ok(new { message = "Product is modifyed" });
+            return Ok(new { message = "Товар изменен!" });
         }
     }
 }

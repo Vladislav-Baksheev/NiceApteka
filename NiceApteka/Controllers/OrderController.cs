@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NiceApteka.Data;
 using NiceApteka.DTO;
@@ -21,8 +22,13 @@ namespace NiceApteka.Controllers
         {
             var user = _db.Users.FirstOrDefault(u => u.Email == email);
 
+            if (user == null)
+            {
+                throw new Exception("Пользователя с такой почтой нет!");
+            }
+            
             var orders = _db.Orders.Where(p => p.UserId == user.UserId).ToList();
-
+            
             List<OrderDTO> ordersDTO = new();
 
             foreach(var order in orders)
@@ -39,24 +45,15 @@ namespace NiceApteka.Controllers
 
                 ordersDTO.Add(orderItem);
             }
-           
-            if (orders == null)
-            {
-                return NotFound();
-            }
 
             return Ok(ordersDTO);
         }
-
-        [Route("order/add")]
+        
+        [Authorize]
+        [Route("/order/add")]
         [HttpPost]
         public IActionResult AddOrder([FromBody]OrderDTO orderDto)
         {
-            if (orderDto == null)
-            {
-                return BadRequest();
-            }
-
             var order = new Order
             {
                 UserId = orderDto.UserId,
@@ -73,7 +70,7 @@ namespace NiceApteka.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                throw new Exception("Ошибка добавления товара!");
             }
             
             return CreatedAtAction(nameof(AddOrder), new { id = orderDto.OrderId }, orderDto);
@@ -85,7 +82,7 @@ namespace NiceApteka.Controllers
             var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId);
             if (order == null)
             {
-                return NotFound("Заказ не найден");
+                throw new Exception("Заказ не найден");
             }
 
             // Обновляем статус заказа
@@ -103,7 +100,7 @@ namespace NiceApteka.Controllers
 
             if (order == null)
             {
-                return NotFound(new { message = "Order not found" });
+                throw new Exception("Заказ не найден");
             }
 
             try
@@ -111,13 +108,13 @@ namespace NiceApteka.Controllers
                 _db.Orders.Remove(order);
                 _db.SaveChanges();
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine(ex.ToString());
+                throw new Exception("Ошибка удаления заказа!");
             }
 
 
-            return Ok(new { message = "Order is deleted" });
+            return Ok(new { message = "Заказ удален!" });
         }
     }
 }

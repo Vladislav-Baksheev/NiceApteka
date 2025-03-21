@@ -269,7 +269,7 @@ function _displayUserFields(userData) {
 
 function addToCart(event) {
     const productId = event.target.dataset.productId; // Получаем ID товара
-    const product = products.find(p => p.productId === productId); // Находим товар
+    const product = products.find(p => p.productId == productId); // Находим товар
 
     if (!product) {
         console.error('Товар не найден');
@@ -361,7 +361,7 @@ function addProduct() {
 function editProduct(event) {
     const productId = event.target.dataset.productId;
     //document.getElementById('productId').value = productId;
-    const product = products.find(p => p.productId === productId);
+    const product = products.find(p => p.productId == productId);
 
     let categorySelect = document.getElementById('productCategoryEdit');
     while (categorySelect.options.length > 0) {
