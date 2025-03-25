@@ -16,6 +16,9 @@ let span = document.getElementById("closeModal");
 let spanProduct = document.getElementById("closeModalProduct");
 let spanAddProduct = document.getElementById("closeModalAddProduct");
 
+let responseDiv = document.getElementById('response');
+let responseP = document.getElementById('responseP');
+
 function init() {
     getCategories()
         .then(() => getProducts())
@@ -267,7 +270,7 @@ function _displayUserFields(userData) {
     phone.value = userData.phoneNumber || '';
 }
 
-function addToCart(event) {
+async function addToCart(event) {
     const productId = event.target.dataset.productId; // Получаем ID товара
     const product = products.find(p => p.productId == productId); // Находим товар
     const token = sessionStorage.getItem(tokenKey);
@@ -284,7 +287,7 @@ function addToCart(event) {
         status: "Ожидает оплаты" // Статус заказа
     };
 
-    fetch(`/order/add`, {
+    const response = await fetch(`/order/add`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -292,18 +295,38 @@ function addToCart(event) {
             'Authorization': "Bearer " + token
         },
         body: JSON.stringify(order)
-    })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка добавления товара в корзину');
-            return response.json();
-        })
-        .then(() => {
-            console.log('Товар успешно добавлен в корзину!');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            console.log('Ошибка при добавлении товара в корзину: ' + error.message);
-        });
+    });
+    if (response.status === 401) {
+        responseDiv.style.display = "block";
+        responseP.innerHTML = "Ошибка: Вы не авторизованы!";
+        setTimeout(() => responseDiv.style.display = 'none', 5000);
+        return;
+    }
+    const data = await response.json();
+
+    if (response.ok) {
+        let answer = 'Товар был добавлен в корзину.';
+        responseDiv.style.display = "block";
+        responseDiv.style.backgroundColor = '#9ef01a';
+        responseP.innerHTML = answer;
+        setTimeout(() => responseDiv.style.display = 'none', 5000);
+    } else {
+        setTimeout(() => {
+            responseDiv.style.display = 'none';
+        }, 5000);
+
+        if (data.errors) {
+            const errorMessages = Object.values(data.errors).flat().join('\n');
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessages;
+        } else {
+            const errorMessage = data.Message || "Произошла ошибка";
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessage;
+        }
+    }
+    return data;
+        
 }
 
 function filterByCategory(event) {
@@ -462,7 +485,7 @@ window.onclick = function (event) {
     }
 };
 
-function saveChangesUser() {
+async function saveChangesUser() {
     const address = document.getElementById("userAddressEdit").value;
     const phone = document.getElementById("userPhoneEdit").value;
     // Формируем объект для отправки
@@ -473,7 +496,7 @@ function saveChangesUser() {
     };
 
     // Отправляем PUT-запрос
-    fetch(`user/edit/${user.name}`, {
+    let response = await fetch(`user/edit/${user.name}`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -481,43 +504,62 @@ function saveChangesUser() {
         },
         body: JSON.stringify(userData)
     })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка сохранения');
-            return response.json();
-        })
-        .then(() => {
-            console.log('Изменения сохранены!');
-            modal.style.display = "none"; // Закрываем модальные окна
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            console.log('Ошибка при сохранении: ' + error.message);
-        });
+    
+    const data = await response.json();
+    
+    if (response.ok){
+        return response.json();
+    }
+    else{
+        setTimeout(() => {
+            responseDiv.style.display = 'none';
+        }, 5000);
+
+        if (data.errors) {
+            const errorMessages = Object.values(data.errors).flat().join('\n');
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessages;
+        } else {
+            const errorMessage = data.Message || "Произошла ошибка";
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessage;
+        }
+    }
+        
 }
 
 // ВСЕ, ЧТО КАСАЕТСЯ МОДАЛЬНЫХ ОКОН, ЗАКАНЧИВАЕТСЯ ТУТ
 
-function payOrder(orderId) {
+async function payOrder(orderId) {
     if (!confirm("Вы уверены, что хотите оплатить этот заказ?")) return;
 
-    fetch(`/order/pay/${orderId}`, {
+    let response = await fetch(`/order/pay/${orderId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
     })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка оплаты заказа');
-            return response.json();
-        })
-        .then(() => {
-            alert('Заказ успешно оплачен!');
-            getOrders(); // Обновляем список заказов
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ошибка при оплате заказа: ' + error.message);
-        });
+    
+    const data = await response.json();
+
+    if (response.ok){
+        return response.json();
+    }
+    else{
+        setTimeout(() => {
+            responseDiv.style.display = 'none';
+        }, 5000);
+
+        if (data.errors) {
+            const errorMessages = Object.values(data.errors).flat().join('\n');
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessages;
+        } else {
+            const errorMessage = data.Message || "Произошла ошибка";
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessage;
+        }
+    }
 }
 
 function deleteOrder(orderId) {

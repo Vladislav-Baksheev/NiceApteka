@@ -15,7 +15,16 @@ namespace NiceApteka.Controllers
         {
             _db = db;
         }
+        
+        [Route("order/get/{id}")]
+        [HttpGet]
+        public IActionResult GetOrdersById([FromRoute] int id)
+        {
+            var order = _db.Orders.FirstOrDefault(u => u.OrderId == id);
 
+            return Ok(order);
+        }
+        
         [Route("order/{email}")]
         [HttpGet]
         public IActionResult GetOrdersByUserEmail([FromRoute] string email)
@@ -67,13 +76,20 @@ namespace NiceApteka.Controllers
             {
                 _db.Orders.Add(order);
                 _db.SaveChanges();
+                return CreatedAtAction(nameof(GetOrdersById), new { id = order.OrderId }, new { 
+                    success = true, 
+                    order = orderDto 
+                });
+
             }
             catch (Exception ex)
             {
-                throw new Exception("Ошибка добавления товара!");
+                return BadRequest(new { 
+                    success = false, 
+                    message = "Ошибка добавления товара!", 
+                    error = ex.Message 
+                });
             }
-            
-            return CreatedAtAction(nameof(AddOrder), new { id = orderDto.OrderId }, orderDto);
         }
 
         [HttpPut("order/pay/{orderId}")]
