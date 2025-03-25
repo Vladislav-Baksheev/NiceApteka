@@ -545,7 +545,12 @@ async function payOrder(orderId) {
     const data = await response.json();
 
     if (response.ok){
-        return response.json();
+        getOrders();
+        let answer = 'Товар был оплачен.';
+        responseDiv.style.display = "block";
+        responseDiv.style.backgroundColor = '#9ef01a';
+        responseP.innerHTML = answer;
+        setTimeout(() => responseDiv.style.display = 'none', 5000);
     }
     else{
         setTimeout(() => {
@@ -586,7 +591,7 @@ function exit() {
     sessionStorage.removeItem(tokenKey);
     sessionStorage.removeItem("email");
     sessionStorage.removeItem("role");
-    sessionStorage.removeItem("");
+    sessionStorage.removeItem(" ");
     window.location.href = 'index.html';
 }
 

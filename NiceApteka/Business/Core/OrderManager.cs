@@ -78,7 +78,7 @@ public class OrderManager
         }
     }
 
-    public string PayOrder(int orderId)
+    public Order PayOrder(int orderId)
     {
         var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId);
         if (order == null)
@@ -90,7 +90,7 @@ public class OrderManager
         order.Status = "Оплачен";
         _db.SaveChanges();
 
-        return "Заказ успешно оплачен";
+        return order;
     }
 
     public string DeleteOrder(int id)
