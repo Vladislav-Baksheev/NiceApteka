@@ -112,8 +112,6 @@ namespace NiceApteka.Controllers
             {
                 throw new Exception("Ошибка удаления заказа!");
             }
-
-
             return Ok(new { message = "Заказ удален!" });
         }
     }

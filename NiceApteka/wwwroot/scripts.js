@@ -270,7 +270,7 @@ function _displayUserFields(userData) {
 function addToCart(event) {
     const productId = event.target.dataset.productId; // Получаем ID товара
     const product = products.find(p => p.productId == productId); // Находим товар
-
+    const token = sessionStorage.getItem(tokenKey);
     if (!product) {
         console.error('Товар не найден');
         return;
@@ -289,6 +289,7 @@ function addToCart(event) {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token
         },
         body: JSON.stringify(order)
     })

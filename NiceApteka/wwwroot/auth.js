@@ -1,7 +1,7 @@
-﻿const authCookieName = 'auth_cookie';
-let user;
+﻿let user;
 let tokenKey = "accessToken";
-
+let responseDiv = document.getElementById('response');
+let responseP = document.getElementById('responseP');
 function init() {
     document.getElementById('exitBtn').classList.add('hidden');
     document.getElementById('linkToProfile').classList.add('hidden');
@@ -13,7 +13,6 @@ function init() {
         };
         document.getElementById('enter').classList.remove('hidden');
         document.getElementById('enter').innerText = user.name;
-        
     }
 }
 
@@ -69,9 +68,19 @@ async function login() {
     }
     else{
         const data = await response.json();
-        alert('Ошибка: ' + data.Message);
+        setTimeout(function() {
+            responseDiv.style.display = 'none'; 
+        }, 5000);
+        if (data.errors) {
+            const errorMessages = Object.values(data.errors).flat().join('\n');
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessages;
+        } else {
+            const errorMessage = data.Message;
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessage;
+        }
     }
-        
 }
 
 //Регистрация
@@ -97,13 +106,27 @@ async function register() {
             },
             body: JSON.stringify(user)
         })
-        if (response.ok === true) {
-            alert('Вы зарегистрировались!');
+        setTimeout(function() {
+            responseDiv.style.display = 'none';
             switchToLogin();
+        }, 3000);
+        if (response.ok === true) {
+            let answer = 'Вы зарегистрировались!';
+            responseDiv.style.display = "block";
+            responseDiv.style.backgroundColor = '#9ef01a';
+            responseP.innerHTML = answer;
         }
         else{
             const data = await response.json();
-            alert('Ошибка: ' + data.Message);
+            if (data.errors) {
+                const errorMessages = Object.values(data.errors).flat().join('\n');
+                responseDiv.style.display = "block";
+                responseP.innerHTML = errorMessages;
+            } else {
+                const errorMessage = data.Message;
+                responseDiv.style.display = "block";
+                responseP.innerHTML = errorMessage;
+            }
         }
     }
 }
