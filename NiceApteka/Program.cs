@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NiceApteka.Business.Core;
 using NiceApteka.Data;
 using NiceApteka.Middlewares;
 using NiceApteka.Services;
@@ -28,6 +29,9 @@ builder.Services.AddDbContext<NiceaptekaContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<PasswordHasher>();
+builder.Services.AddScoped<UserManager>();
+
 
 var app = builder.Build();
 
