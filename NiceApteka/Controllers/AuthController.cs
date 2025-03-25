@@ -68,7 +68,8 @@ namespace NiceApteka.Controllers
             var response = new
             {
                 access_token = encodedJwt,
-                username = person.Email
+                username = person.Email,
+                role = person.Role
             };
             return Ok(response);
         }

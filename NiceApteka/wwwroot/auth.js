@@ -64,6 +64,7 @@ async function login() {
         // сохраняем в хранилище sessionStorage токен доступа
         sessionStorage.setItem(tokenKey, data.access_token);
         sessionStorage.setItem("email", user.Email);
+        sessionStorage.setItem("role", data.role);
         window.location.href = 'index.html';
     }
     else{

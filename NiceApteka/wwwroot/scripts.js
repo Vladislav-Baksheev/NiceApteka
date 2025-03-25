@@ -29,14 +29,16 @@ function init() {
         });
 
     const email = sessionStorage.getItem("email");
+    const role = sessionStorage.getItem("role");
     if (email != null) {
         user = {
-            name: email
+            name: email,
+            role: role
         };
         document.getElementById('exitBtn').classList.remove('hidden');
         document.getElementById('enter').classList.add('hidden');
         document.getElementById('linkToProfile').innerText = user.name;
-        if (user.name === 'admin') {
+        if (user.role === 'admin') {
             let menu = document.getElementById('menuBlock');
 
             let addProductBtn = document.createElement('button');
@@ -232,7 +234,7 @@ function _displayProducts(data) {
         divDescription.appendChild(productDescription);
         divButtons.appendChild(addToCartBtn);
 
-        if (user.name === "admin") {
+        if (user.role === 'admin') {
             editProductBtn.textContent = "Изменить товар";
             deleteProductBtn.textContent = "Удалить товар";
 
@@ -583,6 +585,8 @@ function exit() {
     document.getElementById('linkToProfile').classList.add('hidden');
     sessionStorage.removeItem(tokenKey);
     sessionStorage.removeItem("email");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("");
     window.location.href = 'index.html';
 }
 
