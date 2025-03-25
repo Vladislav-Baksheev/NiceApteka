@@ -49,6 +49,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<UserManager>();
+builder.Services.AddScoped<CategoryManager>();
+builder.Services.AddScoped<OrderManager>();
+builder.Services.AddScoped<ProductManager>();
 
 
 var app = builder.Build();

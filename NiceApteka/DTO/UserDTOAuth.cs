@@ -11,5 +11,4 @@ public partial class UserDTOAuth
 
     [MinLength(6)]
     public string PasswordHash { get; set; } = null!;
-
 }

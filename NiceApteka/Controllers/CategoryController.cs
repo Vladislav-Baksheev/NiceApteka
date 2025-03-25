@@ -1,40 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NiceApteka.Data;
+using NiceApteka.Business.Core;
 using NiceApteka.DTO;
-using NiceApteka.Models;
 
 namespace NiceApteka.Controllers
 {
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly NiceaptekaContext _db;
+        CategoryManager _categoryManager;
 
-        public CategoryController(NiceaptekaContext db)
+        public CategoryController(CategoryManager categoryManager)
         {
-            _db = db;
+            _categoryManager = categoryManager;
         }
 
         [Route("categories")]
         [HttpGet]
         public IActionResult GetCategories()
         {
-            var categories = _db.Categories.ToList();
+            var categories = _categoryManager.GetCategories();
 
-            var categoriesDTO = new List<CategoryDTO>();
-
-            foreach (var category in categories)
-            {
-                var categoryDTO = new CategoryDTO
-                {
-                    CategoryId = category.CategoryId,
-                    Name = category.Name
-                };
-
-                categoriesDTO.Add(categoryDTO);
-            }
-
-            return Ok(categoriesDTO);
+            return Ok(categories);
         }
     }
 }
