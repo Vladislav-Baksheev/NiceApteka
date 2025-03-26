@@ -1,7 +1,7 @@
-﻿const authCookieName = 'auth_cookie';
-let user;
+﻿let user;
 let tokenKey = "accessToken";
-
+let responseDiv = document.getElementById('response');
+let responseP = document.getElementById('responseP');
 function init() {
     document.getElementById('exitBtn').classList.add('hidden');
     document.getElementById('linkToProfile').classList.add('hidden');
@@ -13,7 +13,6 @@ function init() {
         };
         document.getElementById('enter').classList.remove('hidden');
         document.getElementById('enter').innerText = user.name;
-        
     }
 }
 
@@ -65,14 +64,28 @@ async function login() {
         // сохраняем в хранилище sessionStorage токен доступа
         sessionStorage.setItem(tokenKey, data.access_token);
         sessionStorage.setItem("email", user.Email);
+        sessionStorage.setItem("role", data.role);
         window.location.href = 'index.html';
     }
-    else  // если произошла ошибка, получаем код статуса
-        console.log("Status: ", response.status);
+    else{
+        const data = await response.json();
+        setTimeout(function() {
+            responseDiv.style.display = 'none'; 
+        }, 5000);
+        if (data.errors) {
+            const errorMessages = Object.values(data.errors).flat().join('\n');
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessages;
+        } else {
+            const errorMessage = data.Message;
+            responseDiv.style.display = "block";
+            responseP.innerHTML = errorMessage;
+        }
+    }
 }
 
 //Регистрация
-function register() {
+async function register() {
     const registerEmailTextbox = document.getElementById('registerEmail');
     const registerPassTextbox = document.getElementById('registerPassword');
     const repeatRegisterPassTextbox = document.getElementById('repeatRegisterPassword');
@@ -86,7 +99,7 @@ function register() {
             PasswordHash: registerPassTextbox.value.trim()
         }
 
-        fetch("register/user", {
+        const response = await fetch("register/user", {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -94,8 +107,27 @@ function register() {
             },
             body: JSON.stringify(user)
         })
-            .then(response => response.json())
-            .catch(error => console.error('Unable to register.', error));
-        switchToLogin();
+        setTimeout(function() {
+            responseDiv.style.display = 'none';
+            switchToLogin();
+        }, 3000);
+        if (response.ok === true) {
+            let answer = 'Вы зарегистрировались!';
+            responseDiv.style.display = "block";
+            responseDiv.style.backgroundColor = '#9ef01a';
+            responseP.innerHTML = answer;
+        }
+        else{
+            const data = await response.json();
+            if (data.errors) {
+                const errorMessages = Object.values(data.errors).flat().join('\n');
+                responseDiv.style.display = "block";
+                responseP.innerHTML = errorMessages;
+            } else {
+                const errorMessage = data.Message;
+                responseDiv.style.display = "block";
+                responseP.innerHTML = errorMessage;
+            }
+        }
     }
 }

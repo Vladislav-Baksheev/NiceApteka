@@ -204,7 +204,14 @@ a {
     cursor: pointer;
 }
 
-
+#response{
+    align-content: center;
+    display: none;
+    text-align: center;
+    background-color: #e78989;
+    height: 50px;
+    margin: 5px;
+}
 #authBlock {
     width: 50%;
     height: 600px;

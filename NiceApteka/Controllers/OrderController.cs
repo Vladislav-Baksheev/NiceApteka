@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NiceApteka.Data;
+using NiceApteka.Business.Core;
 using NiceApteka.DTO;
 using NiceApteka.Models;
 
@@ -9,115 +9,51 @@ namespace NiceApteka.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        private readonly NiceaptekaContext _db;
-        public OrderController(NiceaptekaContext db)
+        OrderManager _orderManager;
+        
+        public OrderController(OrderManager orderManager)
         {
-            _db = db;
+            _orderManager = orderManager;
         }
-
+        
+        [Route("order/get/{id}")]
+        [HttpGet]
+        public IActionResult GetOrderById([FromRoute] int id)
+        {
+            var response = _orderManager.GetOrderById(id);
+            return Ok(response);
+        }
+        
         [Route("order/{email}")]
         [HttpGet]
         public IActionResult GetOrdersByUserEmail([FromRoute] string email)
         {
-            var user = _db.Users.FirstOrDefault(u => u.Email == email);
-
-            var orders = _db.Orders.Where(p => p.UserId == user.UserId).ToList();
-
-            List<OrderDTO> ordersDTO = new();
-
-            foreach(var order in orders)
-            {
-                var orderItem = new OrderDTO
-                {
-                    OrderId = order.OrderId,
-                    UserId = order.UserId,
-                    ProductId = order.ProductId,
-                    Quantity = order.Quantity,
-                    Price = order.Price,
-                    Status = order.Status
-                };
-
-                ordersDTO.Add(orderItem);
-            }
-           
-            if (orders == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(ordersDTO);
+            var response = _orderManager.GetOrdersByUserEmail(email);
+            return Ok(response);
         }
-
-        [Route("order/add")]
+        
+        [Authorize]
+        [Route("/order/add")]
         [HttpPost]
         public IActionResult AddOrder([FromBody]OrderDTO orderDto)
         {
-            if (orderDto == null)
-            {
-                return BadRequest();
-            }
-
-            var order = new Order
-            {
-                UserId = orderDto.UserId,
-                ProductId = orderDto.ProductId,
-                Quantity = orderDto.Quantity,
-                Price = orderDto.Price,
-                Status = orderDto.Status
-            };
-
-            try
-            {
-                _db.Orders.Add(order);
-                _db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-            
-            return CreatedAtAction(nameof(AddOrder), new { id = orderDto.OrderId }, orderDto);
+            var response = _orderManager.AddOrder(orderDto);
+            return Ok(response);
         }
 
         [HttpPut("order/pay/{orderId}")]
         public IActionResult PayOrder(int orderId)
         {
-            var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId);
-            if (order == null)
-            {
-                return NotFound("Заказ не найден");
-            }
-
-            // Обновляем статус заказа
-            order.Status = "Оплачен";
-            _db.SaveChanges();
-
-            return Ok(new { message = "Заказ успешно оплачен" });
+            var response = _orderManager.PayOrder(orderId);
+            return Ok(response);
         }
 
         [Route("order/delete/{id}")]
         [HttpDelete]
         public IActionResult DeleteOrder([FromRoute] int id)
         {
-            var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
-
-            if (order == null)
-            {
-                return NotFound(new { message = "Order not found" });
-            }
-
-            try
-            {
-                _db.Orders.Remove(order);
-                _db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-
-            return Ok(new { message = "Order is deleted" });
+            var response = _orderManager.DeleteOrder(id);
+            return Ok(response);
         }
     }
 }
