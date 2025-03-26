@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NiceApteka.Data;
 using NiceApteka.DTO;
 using NiceApteka.Models;
+using NiceApteka.Services;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 
 namespace NiceApteka.Controllers
 {
@@ -13,12 +19,14 @@ namespace NiceApteka.Controllers
     {
         private readonly NiceaptekaContext _db;
 
+        private readonly PasswordHasher _passwordHasher = new PasswordHasher();
+
         public AuthController(NiceaptekaContext db) 
         {
             _db = db;
         }
 
-        [Route("auth/users")]
+        [Route("users")]
         [HttpGet]
         public IActionResult GetUsers()
         {
@@ -45,7 +53,7 @@ namespace NiceApteka.Controllers
             return Ok(usersDTO);
         }
 
-        [Route("auth/users/{id}")]
+        [Route("user/{id}")]
         [HttpGet]
         public IActionResult GetUserById([FromRoute] int id)
         {
@@ -64,7 +72,28 @@ namespace NiceApteka.Controllers
             return Ok(userDTO);
         }
 
-        [Route("auth/users/register")]
+        [Route("userByEmail/{email}")]
+        [HttpGet]
+        public IActionResult GetUserByEmail([FromRoute] string email)
+        {
+            var user = _db.Users.FirstOrDefault(p => p.Email == email);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userDTO = new UserDTOResponse
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Address = user.Address,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return Ok(userDTO);
+        }
+
+        [Route("register/user")]
         [HttpPost]
         public IActionResult RegisterUser(UserDTORegister userDto)
         {
@@ -72,12 +101,23 @@ namespace NiceApteka.Controllers
             {
                 return BadRequest();
             }
-
+            if (!userDto.Email.Contains("@"))
+            {
+                throw new Exception("В почте отсутствует @");
+            }
+            if (_db.Users.Any(x => x.Email == userDto.Email))
+            {
+                throw new Exception("Почта занята");
+            }
+            if (userDto.PasswordHash.Length < 6)
+            {
+                throw new Exception("Пароль слишком короткий");
+            }
             var user = new User
             {
                 UserId = userDto.UserId,
                 Email = userDto.Email,
-                PasswordHash = userDto.PasswordHash,
+                PasswordHash = _passwordHasher.Generate(userDto.PasswordHash),
                 Address = userDto.Address,
                 PhoneNumber = userDto.PhoneNumber
             };
@@ -91,24 +131,74 @@ namespace NiceApteka.Controllers
             {
                 Console.WriteLine(ex.ToString());   
             }
-            
+
             return CreatedAtAction(nameof(GetUserById), new { id = userDto.UserId }, userDto); 
         }
 
-        [Route("auth/users/auth")]
+        [Route("auth/user")]
         [HttpPost]
         public IActionResult AuthUser(UserDTOAuth userDto)
         {
-            var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email && p.PasswordHash == userDto.PasswordHash);
+            var person = _db.Users.FirstOrDefault(p => p.Email == userDto.Email);
 
-            if (person is null) return Unauthorized();
-
-            var response = new
+            
+            if (person is null) 
             {
-                username = person.Email 
-            };
+                return BadRequest();
+            }
 
-            return Ok(response);
+            var isLogged = _passwordHasher.Verify(userDto.PasswordHash, person.PasswordHash);
+
+            if (isLogged == true)
+            {
+                var claims = new List<Claim> 
+                { 
+                    new Claim(ClaimTypes.Name, person.Email),
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role)
+                };
+                // создаем JWT-токен
+                var jwt = new JwtSecurityToken(
+                        issuer: AuthOptions.ISSUER,
+                        audience: AuthOptions.AUDIENCE,
+                        claims: claims,
+                        expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(60)),
+                        signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+
+                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                var response = new
+                {
+                    access_token = encodedJwt,
+                    username = person.Email
+                };
+                return Ok(response);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+            
+        }
+
+        [Route("user/edit/{email}")] 
+        [HttpPut]
+        public IActionResult EditUser([FromRoute] string email, [FromBody] UserDTOResponse userDto) 
+        {
+            // Находим пользователя по email
+            var user = _db.Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Обновляем только изменяемые поля
+            user.Address = userDto.Address;
+            user.PhoneNumber = userDto.PhoneNumber;
+
+            _db.SaveChanges();
+
+            return Ok(new { message = "Данные обновлены" });
         }
     }
 }

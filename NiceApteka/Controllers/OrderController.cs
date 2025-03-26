@@ -15,62 +15,42 @@ namespace NiceApteka.Controllers
             _db = db;
         }
 
-        [Route("orders")]
+        [Route("order/{email}")]
         [HttpGet]
-        public IActionResult GetOrders()
+        public IActionResult GetOrdersByUserEmail([FromRoute] string email)
         {
-            var orders = _db.Orders.ToList();
+            var user = _db.Users.FirstOrDefault(u => u.Email == email);
 
-            var ordersDTO = new List<OrderDTO>();
+            var orders = _db.Orders.Where(p => p.UserId == user.UserId).ToList();
 
+            List<OrderDTO> ordersDTO = new();
+
+            foreach(var order in orders)
+            {
+                var orderItem = new OrderDTO
+                {
+                    OrderId = order.OrderId,
+                    UserId = order.UserId,
+                    ProductId = order.ProductId,
+                    Quantity = order.Quantity,
+                    Price = order.Price,
+                    Status = order.Status
+                };
+
+                ordersDTO.Add(orderItem);
+            }
+           
             if (orders == null)
             {
                 return NotFound();
             }
 
-            foreach (var order in orders)
-            {
-                var orderDTO = new OrderDTO
-                {
-                    OrderId = order.OrderId,
-                    Quantity = order.Quantity,
-                    Price = order.Price,
-                    Status = order.Status,
-                    CreatedAt = order.CreatedAt
-                };
-
-                ordersDTO.Add(orderDTO);
-            }
-
             return Ok(ordersDTO);
-        }
-
-        [Route("order/{id}")]
-        [HttpGet]
-        public IActionResult GetOrderById([FromRoute] int id)
-        {
-            var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            var orderDTO = new OrderDTO
-            {
-                OrderId = order.OrderId,
-                Quantity = order.Quantity,
-                Price = order.Price,
-                Status = order.Status,
-                CreatedAt = order.CreatedAt
-            };
-
-            return Ok(orderDTO);
         }
 
         [Route("order/add")]
         [HttpPost]
-        public IActionResult AddOrder(OrderDTO orderDto)
+        public IActionResult AddOrder([FromBody]OrderDTO orderDto)
         {
             if (orderDto == null)
             {
@@ -79,11 +59,11 @@ namespace NiceApteka.Controllers
 
             var order = new Order
             {
-                OrderId = orderDto.OrderId,
+                UserId = orderDto.UserId,
+                ProductId = orderDto.ProductId,
                 Quantity = orderDto.Quantity,
                 Price = orderDto.Price,
-                Status = orderDto.Status,
-                CreatedAt = orderDto.CreatedAt
+                Status = orderDto.Status
             };
 
             try
@@ -96,7 +76,48 @@ namespace NiceApteka.Controllers
                 Console.WriteLine(ex.ToString());
             }
             
-            return CreatedAtAction(nameof(GetOrderById), new { id = orderDto.OrderId }, orderDto);
+            return CreatedAtAction(nameof(AddOrder), new { id = orderDto.OrderId }, orderDto);
+        }
+
+        [HttpPut("order/pay/{orderId}")]
+        public IActionResult PayOrder(int orderId)
+        {
+            var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId);
+            if (order == null)
+            {
+                return NotFound("Заказ не найден");
+            }
+
+            // Обновляем статус заказа
+            order.Status = "Оплачен";
+            _db.SaveChanges();
+
+            return Ok(new { message = "Заказ успешно оплачен" });
+        }
+
+        [Route("order/delete/{id}")]
+        [HttpDelete]
+        public IActionResult DeleteOrder([FromRoute] int id)
+        {
+            var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
+
+            if (order == null)
+            {
+                return NotFound(new { message = "Order not found" });
+            }
+
+            try
+            {
+                _db.Orders.Remove(order);
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+
+            return Ok(new { message = "Order is deleted" });
         }
     }
 }

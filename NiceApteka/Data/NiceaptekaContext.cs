@@ -9,6 +9,7 @@ public partial class NiceaptekaContext : DbContext
 {
     public NiceaptekaContext()
     {
+        Database.EnsureCreated();
     }
 
     public NiceaptekaContext(DbContextOptions<NiceaptekaContext> options)
@@ -127,6 +128,9 @@ public partial class NiceaptekaContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .HasColumnName("phone_number");
+            entity.Property(e => e.Role)
+                .HasMaxLength(10)
+                .HasColumnName("role");
         });
 
         OnModelCreatingPartial(modelBuilder);
