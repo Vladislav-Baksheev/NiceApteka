@@ -54,18 +54,11 @@ public class UserManager
 
     public UserDTORegister RegisterUser(UserDTORegister userDto)
     {
-        if (!userDto.Email.Contains("@"))
-        {
-            throw new Exception("В почте отсутствует @");
-        }
         if (_db.Users.Any(x => x.Email == userDto.Email))
         {
             throw new Exception("Почта занята");
         }
-        if (userDto.PasswordHash.Length < 6)
-        {
-            throw new Exception("Пароль слишком короткий");
-        }
+        
         var user = new User
         {
             UserId = userDto.UserId,

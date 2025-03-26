@@ -4,6 +4,7 @@ using NiceApteka.DTO;
 using NiceApteka.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using NiceApteka.Business.Core;
 
 namespace NiceApteka.Controllers
@@ -11,8 +12,6 @@ namespace NiceApteka.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly PasswordHasher _passwordHasher = new PasswordHasher();
-        
         private readonly UserManager _userManager;
         
         public AuthController(UserManager userManager) 
@@ -73,7 +72,8 @@ namespace NiceApteka.Controllers
             };
             return Ok(response);
         }
-
+        
+        [Authorize]
         [Route("user/edit/{email}")] 
         [HttpPut]
         public IActionResult EditUser([FromRoute] string email, [FromBody] UserDTOResponse userDto) 

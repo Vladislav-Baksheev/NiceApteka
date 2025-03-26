@@ -40,14 +40,16 @@ namespace NiceApteka.Controllers
             var response = _orderManager.AddOrder(orderDto);
             return Ok(response);
         }
-
+        
+        [Authorize]
         [HttpPut("order/pay/{orderId}")]
         public IActionResult PayOrder(int orderId)
         {
             var response = _orderManager.PayOrder(orderId);
             return Ok(response);
         }
-
+        
+        [Authorize]
         [Route("order/delete/{id}")]
         [HttpDelete]
         public IActionResult DeleteOrder([FromRoute] int id)
