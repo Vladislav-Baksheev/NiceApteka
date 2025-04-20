@@ -308,27 +308,11 @@ async function addToCart(event) {
 
     if (response.ok) {
         let answer = 'Товар был добавлен в корзину.';
-        responseDiv.style.display = "block";
-        responseDiv.style.backgroundColor = '#9ef01a';
-        responseP.innerHTML = answer;
-        setTimeout(() => responseDiv.style.display = 'none', 5000);
+        _displaySuccessResponse(answer);
     } else {
-        setTimeout(() => {
-            responseDiv.style.display = 'none';
-        }, 5000);
-
-        if (data.errors) {
-            const errorMessages = Object.values(data.errors).flat().join('\n');
-            responseDiv.style.display = "block";
-            responseP.innerHTML = errorMessages;
-        } else {
-            const errorMessage = data.Message || "Произошла ошибка";
-            responseDiv.style.display = "block";
-            responseP.innerHTML = errorMessage;
-        }
+        _displayErrors(data);
     }
     return data;
-        
 }
 
 function filterByCategory(event) {
@@ -355,7 +339,7 @@ function openAddProduct() {
     });
 }
 
-function addProduct() {
+async function addProduct() {
     let index = document.getElementById('productCategory').selectedIndex;
     const token = sessionStorage.getItem(tokenKey);
     let category = categories[index];
@@ -368,7 +352,7 @@ function addProduct() {
         imageUrl: document.getElementById('productPhoto').value
     };
 
-    fetch(`product/add`, {
+    let response = await fetch(`product/add`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -376,12 +360,16 @@ function addProduct() {
         },
         body: JSON.stringify(product)
     })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка сохранения');
-            modalAddProduct.style.display = 'none';
-            getProducts(); // Обновляем список товаров
-        })
-        .catch(error => alert(error.message));
+    const data = await response.json();
+    
+    if(response.ok) {
+        let answer = "Товар был добавлен.";
+        _displaySuccessResponse(answer);
+        await getProducts();
+    }
+    else{
+        _displayErrors(data);
+    }
 }
 
 function editProduct(event) {
@@ -409,26 +397,30 @@ function editProduct(event) {
     ProductId = productId;
 }
 
-function deleteProduct(event) {
+async function deleteProduct(event) {
     if (!confirm('Вы уверены, что хотите удалить товар?')) return;
     const token = sessionStorage.getItem(tokenKey);
     const productId = event.target.dataset.productId;
 
-    fetch(`/product/delete/${productId}`, {
+    let response = await fetch(`/product/delete/${productId}`, {
         method: 'DELETE',
         headers: {
             'Authorization': "Bearer " + token
         },
     })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка удаления');
-            products = [];
-            getProducts(); // Обновляем список товаров
-        })
-        .catch(error => alert(error.message));
+    const data = await response.json();
+    
+    if(response.ok) {
+        let answer = "Заказ удален.";
+        _displaySuccessResponse(answer);
+        await getProducts();
+    }
+    else{
+        _displayErrors(data);
+    }
 }
 
-function saveProductChanges() {
+async function saveProductChanges() {
     let index = document.getElementById('productCategoryEdit').selectedIndex;
     const token = sessionStorage.getItem(tokenKey);
     let category = categories[index];
@@ -442,7 +434,7 @@ function saveProductChanges() {
         imageUrl: document.getElementById('productPhotoEdit').value
     };
 
-    fetch(`/product/edit/${productData.productId}`, {
+    let response = await fetch(`/product/edit/${productData.productId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -450,12 +442,16 @@ function saveProductChanges() {
         },
         body: JSON.stringify(productData)
     })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка сохранения');
-            modalProduct.style.display = 'none';
-            getProducts(); // Обновляем список товаров
-        })
-        .catch(error => alert(error.message));
+    const data = await response.json();
+    
+    if(response.ok){
+        let answer = "Товар был изменен.";
+        _displaySuccessResponse(answer);
+        await getProducts();
+    }
+    else{
+        _displayErrors(data);
+    }
 }
 
 function openEditUser() {
@@ -490,6 +486,7 @@ window.onclick = function (event) {
 async function saveChangesUser() {
     const address = document.getElementById("userAddressEdit").value;
     const phone = document.getElementById("userPhoneEdit").value;
+    const token = sessionStorage.getItem(tokenKey);
     // Формируем объект для отправки
     const userData = {
         email: user.name, // Предполагая, что user.name содержит email
@@ -503,6 +500,7 @@ async function saveChangesUser() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token
         },
         body: JSON.stringify(userData)
     })
@@ -510,22 +508,11 @@ async function saveChangesUser() {
     const data = await response.json();
     
     if (response.ok){
-        return response.json();
+        let answer = "Данные были изменены.";
+        _displaySuccessResponse(answer);
     }
     else{
-        setTimeout(() => {
-            responseDiv.style.display = 'none';
-        }, 5000);
-
-        if (data.errors) {
-            const errorMessages = Object.values(data.errors).flat().join('\n');
-            responseDiv.style.display = "block";
-            responseP.innerHTML = errorMessages;
-        } else {
-            const errorMessage = data.Message || "Произошла ошибка";
-            responseDiv.style.display = "block";
-            responseP.innerHTML = errorMessage;
-        }
+        _displayErrors(data);
     }
         
 }
@@ -534,11 +521,12 @@ async function saveChangesUser() {
 
 async function payOrder(orderId) {
     if (!confirm("Вы уверены, что хотите оплатить этот заказ?")) return;
-
+    const token = sessionStorage.getItem(tokenKey);
     let response = await fetch(`/order/pay/${orderId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token
         },
     })
     
@@ -547,40 +535,33 @@ async function payOrder(orderId) {
     if (response.ok){
         getOrders();
         let answer = 'Товар был оплачен.';
-        responseDiv.style.display = "block";
-        responseDiv.style.backgroundColor = '#9ef01a';
-        responseP.innerHTML = answer;
-        setTimeout(() => responseDiv.style.display = 'none', 5000);
+        _displaySuccessResponse(answer);
     }
     else{
-        setTimeout(() => {
-            responseDiv.style.display = 'none';
-        }, 5000);
-
-        if (data.errors) {
-            const errorMessages = Object.values(data.errors).flat().join('\n');
-            responseDiv.style.display = "block";
-            responseP.innerHTML = errorMessages;
-        } else {
-            const errorMessage = data.Message || "Произошла ошибка";
-            responseDiv.style.display = "block";
-            responseP.innerHTML = errorMessage;
-        }
+        _displayErrors(data);
     }
 }
 
-function deleteOrder(orderId) {
+async function deleteOrder(orderId) {
     if (!confirm('Вы уверены, что хотите удалить товар?')) return;
-
-    fetch(`/order/delete/${orderId}`, {
-        method: 'DELETE'
+    const token = sessionStorage.getItem(tokenKey);
+    
+    let response = await fetch(`/order/delete/${orderId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': "Bearer " + token
+        }
     })
-        .then(response => {
-            if (!response.ok) throw new Error('Ошибка удаления');
-
-            getOrders(); // Обновляем список товаров
-        })
-        .catch(error => alert(error.message));
+    const data = await response.json();
+    if(response.ok){
+        let answer = "Заказ был удален.";
+        _displaySuccessResponse(answer);
+        await getOrders();
+    }
+    else{
+        _displayErrors(data);
+    }
 }
 
 //Выйти с аккаунта
@@ -607,4 +588,26 @@ function showCart() {
     document.getElementById('wrapper').style.display = 'none';
     document.getElementById('cart-page').style.display = 'block';
     getOrders(); // Загружаем заказы
+}
+
+function _displayErrors(data){
+    setTimeout(() => {
+        responseDiv.style.display = 'none';
+    }, 5000);
+    responseDiv.style.display = "block";
+    responseDiv.style.backgroundColor = '#e78989';
+    if (data.errors) {
+        const errorMessages = Object.values(data.errors).flat().join('\n');
+        responseP.innerHTML = errorMessages;
+    } else {
+        const errorMessage = data.Message || "Произошла ошибка";
+        responseP.innerHTML = errorMessage;
+    }
+}
+
+function _displaySuccessResponse(answer){
+    responseDiv.style.display = "block";
+    responseDiv.style.backgroundColor = '#9ef01a';
+    responseP.innerHTML = answer;
+    setTimeout(() => responseDiv.style.display = 'none', 5000);
 }

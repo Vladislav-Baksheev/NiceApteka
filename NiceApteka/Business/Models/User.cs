@@ -12,9 +12,9 @@ public partial class User
 
     public string? PhoneNumber { get; set; }
 
-    public string Role { get; set; } = "user";
+    public string Role { get; } = "user";
 
-    public DateTime? CreatedAt { get; set; } = DateTime.Now.ToUniversalTime();
+    public DateTime? CreatedAt { get; } = DateTime.Now.ToUniversalTime();
 
     public virtual ICollection<Order>? Orders { get; set; } = new List<Order>();
 }

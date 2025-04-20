@@ -12,6 +12,4 @@ public partial class UserDTOResponse
     public string Address { get; set; } = null!;
 
     public string PhoneNumber { get; set; } = null!;
-    
-    public string Role { get; set; } = null!;
 }

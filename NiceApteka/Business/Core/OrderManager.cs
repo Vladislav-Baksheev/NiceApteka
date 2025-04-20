@@ -77,7 +77,7 @@ public class OrderManager
             throw new Exception(ex.Message);
         }
     }
-
+    
     public Order PayOrder(int orderId)
     {
         var order = _db.Orders.FirstOrDefault(o => o.OrderId == orderId);
@@ -93,7 +93,7 @@ public class OrderManager
         return order;
     }
 
-    public string DeleteOrder(int id)
+    public Order DeleteOrder(int id)
     {
         var order = _db.Orders.FirstOrDefault(p => p.OrderId == id);
 
@@ -111,6 +111,6 @@ public class OrderManager
         {
             throw new Exception("Ошибка удаления заказа!");
         }
-        return "Заказ удален!";
+        return order;
     }
 }
