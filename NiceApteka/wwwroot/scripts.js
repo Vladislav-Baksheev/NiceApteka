@@ -365,6 +365,7 @@ async function addProduct() {
     if(response.ok) {
         let answer = "Товар был добавлен.";
         _displaySuccessResponse(answer);
+        await getProducts();
     }
     else{
         _displayErrors(data);
@@ -412,6 +413,7 @@ async function deleteProduct(event) {
     if(response.ok) {
         let answer = "Заказ удален.";
         _displaySuccessResponse(answer);
+        await getProducts();
     }
     else{
         _displayErrors(data);
@@ -445,6 +447,7 @@ async function saveProductChanges() {
     if(response.ok){
         let answer = "Товар был изменен.";
         _displaySuccessResponse(answer);
+        await getProducts();
     }
     else{
         _displayErrors(data);
@@ -553,7 +556,8 @@ async function deleteOrder(orderId) {
     const data = await response.json();
     if(response.ok){
         let answer = "Заказ был удален.";
-        _displaySuccessResponse(answer)
+        _displaySuccessResponse(answer);
+        await getOrders();
     }
     else{
         _displayErrors(data);

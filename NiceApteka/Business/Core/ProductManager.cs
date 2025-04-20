@@ -86,13 +86,13 @@ public class ProductManager
         return product;
     }
 
-    public string DeleteProduct(int id)
+    public Product DeleteProduct(int id)
     {
         var product = _db.Products.FirstOrDefault(p => p.ProductId == id);
 
         if (product == null)
         {
-            return "Product not found";
+            throw new Exception("Товар не найден!");
         }
 
         try
@@ -105,10 +105,10 @@ public class ProductManager
             throw new Exception("Ошибка удаления товара!");
         }
         
-        return "Товар удален";
+        return product;
     }
 
-    public string EditProduct(int id, ProductDTO productDto)
+    public Product EditProduct(int id, ProductDTO productDto)
     {
         var product = _db.Products.FirstOrDefault(p => p.ProductId == id);
 
@@ -126,6 +126,6 @@ public class ProductManager
 
         _db.SaveChanges();
 
-        return "Товар изменен!";
+        return product;
     }
 }
